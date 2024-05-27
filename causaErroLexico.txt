@@ -1,0 +1,9 @@
+def erro(A) {
+    for (i = 0; i < 10; i = i + 1)
+        print i+A;
+    if (A != 5){
+        x = A@/10;
+        break;
+    }
+    return;
+}

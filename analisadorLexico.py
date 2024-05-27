@@ -29,7 +29,8 @@ class AnalisadorLexico:
                             tipo = "ID"
                         elif caracter in self.simbolosEspeciais:
                             lexemaAtual.append(caracter)
-                            tipo = "SE"
+                            self.inserirToken("".join(lexemaAtual), "SE", linhaAtual, colunaAtual)
+                            tipo = None
                         elif caracter in self.operadores:
                             lexemaAtual.append(caracter)
                             tipo = "OP"
@@ -39,14 +40,14 @@ class AnalisadorLexico:
                         elif caracter.isnumeric():
                             lexemaAtual.append(caracter)
                             tipo = "CT"
-                        elif caracter == " ":
+                        elif caracter == " " or caracter == "\n":
                             pass
                         else:
-                            self.erro(linhaAtual, colunaAtual)
+                            self.erro(linhaAtual, colunaAtual, caracter)
                     elif tipo == "ID" and caracter.isalnum():
                         lexemaAtual.append(caracter)
-                    elif tipo == "SE" and caracter in self.simbolosEspeciais:
-                        lexemaAtual.append(caracter)
+                    #elif tipo == "SE" and caracter in self.simbolosEspeciais:
+                    #    lexemaAtual.append(caracter)
                     elif tipo == "OP" and caracter in self.operadores:
                         lexemaAtual.append(caracter)
                     elif tipo == "CP" and caracter in self.comparadores:
@@ -75,11 +76,15 @@ class AnalisadorLexico:
                         elif caracter.isnumeric():
                             lexemaAtual.append(caracter)
                             tipo = "CT"
+                        elif caracter == "\n":
+                            tipo = None 
+                        else:
+                            self.erro(linhaAtual, colunaAtual, caracter)
         return self.tabelaDeSimbolos
                             
 
-    def erro(self, linha, coluna):
-        print(f"ERRO LÉXICO na linha {linha} e coluna {coluna}")
+    def erro(self, linha, coluna, caracter):
+        print(f"ERRO LÉXICO na linha {linha} e coluna {coluna} -> {caracter}")
 
     def inserirToken(self, token, tipo, linha, coluna):
         if token not in self.tabelaDeSimbolos:
@@ -94,6 +99,6 @@ class AnalisadorLexico:
             self.tabelaDeSimbolos[token]['posicao'].append((linha,coluna-len(token)))
 
 al = AnalisadorLexico()
-print(al.executar("teste.txt"))
-
+#print(al.executar("testeSimples.txt"))
+print(al.executar("causaErroLexico.txt"))
                 
