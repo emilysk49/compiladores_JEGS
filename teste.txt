@@ -1,0 +1,22 @@
+def funcao(a, b){
+    x = a+b;
+    y = b*2;
+    return;
+}
+
+{'def': {'tipo': 'PR', 'posicao': [(1, 1)]}, 
+'funcao': {'tipo': 'ID', 'posicao': [(1, 5)]}, 
+'(': {'tipo': 'SE', 'posicao': [(1, 11)]}, 
+'a': {'tipo': 'ID', 'posicao': [(1, 12), (2, 9)]}, 
+',': {'tipo': 'SE', 'posicao': [(1, 13)]}, 
+'b': {'tipo': 'ID', 'posicao': [(1, 15), (2, 11), (3, 9)]}, 
+'){': {'tipo': 'SE', 'posicao': [(1, 16)]}, 
+'': {'tipo': 'SE', 'posicao': [(2, 1), (3, 1), (4, 1)]}, 
+'x': {'tipo': 'ID', 'posicao': [(2, 5)]}, 
+'=': {'tipo': 'CP', 'posicao': [(2, 7), (3, 7)]}, 
+'+': {'tipo': 'OP', 'posicao': [(2, 10)]}, 
+';': {'tipo': 'SE', 'posicao': [(2, 12), (3, 12), (4, 11)]}, 
+'y': {'tipo': 'ID', 'posicao': [(3, 5)]}, 
+'*': {'tipo': 'OP', 'posicao': [(3, 10)]}, 
+'2': {'tipo': 'CT', 'posicao': [(3, 11)]}, 
+'return': {'tipo': 'PR', 'posicao': [(4, 5)]}}
