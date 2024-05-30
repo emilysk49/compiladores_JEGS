@@ -73,7 +73,7 @@ class AnalisadorLexico:
                 self.inserirNaTabela(linha, coluna)
                 #como leu caracter a mais, executa essa funcao de novo com o mesmo caracter 
                 self.automatoFinito(caracter, linha, coluna) 
-        #Estado CTN_NUM* (pode numeros)
+        #Estado CTN_NUM* (pode numeros ou "." do float)
         elif self.estadoAtual == "CTN_NUM*":
             if caracter.isnumeric():
                 self.lexema += caracter
@@ -104,6 +104,7 @@ class AnalisadorLexico:
                 self.inserirNaTabela(linha, coluna)
             else:
                 self.lexema += caracter
+        #Estado CTF_NUM* (pode numeros)
         elif self.estadoAtual == "CTF_NUM*":
             if caracter.isnumeric():
                 self.lexema += caracter
@@ -125,7 +126,6 @@ class AnalisadorLexico:
             self.tabelaDeSimbolos[self.lexema]["posicao"].append((linha, coluna-len(self.lexema)))
         self.estadoAtual = "INICIO"
         self.lexema = ""
-        self.tipo = None #TALVEZ N PRECISA
 
     def erro(self, linha, coluna):
         print(f"ERRO LÉXICO NA LINHA {linha} E COLUNA {coluna}")
