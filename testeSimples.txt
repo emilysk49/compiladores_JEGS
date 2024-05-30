@@ -1,5 +1,6 @@
 def funcao(a, b){
-    x = a+b;
-    y = b*2;
+    x = a>b;
+    y = b*50.152;
+    print "@nao cau#sa erro lexico$";
     return;
 }
