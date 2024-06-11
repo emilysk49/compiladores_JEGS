@@ -1,6 +1,6 @@
-def funcao(a, b){
+def funcao(int a, int b){
     x = a>b;
     y = b*50.152;
     print "@nao cau#sa erro lexico$";
-    return;
+    return x;
 }

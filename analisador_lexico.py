@@ -53,12 +53,12 @@ class AnalisadorLexico:
                 self.estadoAtual = "SE_ACEITO"
                 self.lexema += caracter
                 self.tipo = "SE"
-                self.inserirNaTabela(linha, coluna+1)
+                self.resetar()
             elif caracter in self.operadores: #Operador
                 self.estadoAtual = "OP_ACEITO"
                 self.lexema += caracter
                 self.tipo = "OP"
-                self.inserirNaTabela(linha, coluna+1)
+                self.resetar()
             elif caracter == "\"": #String
                 self.estadoAtual = "ST_TUDO*"
                 self.tipo = "ST"
@@ -90,22 +90,22 @@ class AnalisadorLexico:
             if caracter == "=":
                 self.estadoAtual = "CP_ACEITO"
             else:
-                self.inserirNaTabela(linha, coluna)
+                self.resetar()
                 self.automatoFinito(caracter, linha, coluna)
         #Estado CP_ACEITO (nao pode comparadores)
         elif self.estadoAtual == "CP_ACEITO":
             if caracter in self.comparadores:
                 self.erro(linha, coluna)
             else:
-                self.inserirNaTabela(linha, coluna)
+                self.resetar()
                 self.automatoFinito(caracter, linha, coluna)
         #Estado ST_TUDO* (tudo dentro de aspas valido)
         elif self.estadoAtual == "ST_TUDO*":
-            if caracter == "\"":
+            if caracter == "\"": #se eh fecha aspas
                 self.inserirNaTabela(linha, coluna)
             else:
                 self.lexema += caracter
-        #Estado CTF_NUM* (pode numeros)
+        #Estado CTF_NUM* (pode numeros que seriam decimais)
         elif self.estadoAtual == "CTF_NUM*":
             if caracter.isnumeric():
                 self.lexema += caracter
@@ -113,21 +113,28 @@ class AnalisadorLexico:
                 self.inserirNaTabela(linha, coluna)
                 self.automatoFinito(caracter, linha, coluna)
 
-
-    def inserirNaTabela(self, linha, coluna):
-        if self.lexema not in self.tabelaDeSimbolos:
-            #{var: {tipo: 'ID', posicao: [(1,3), (3,8)]}}
-            self.tabelaDeSimbolos[self.lexema] = {}
-            if self.tipo == "ID" and self.lexema in self.palavrasReservadas:
-                self.tabelaDeSimbolos[self.lexema]["tipo"] = "PR"
-            else:
-                self.tabelaDeSimbolos[self.lexema]["tipo"] = self.tipo
-            self.tabelaDeSimbolos[self.lexema]["posicao"] = [(linha, coluna-len(self.lexema))]
-        else:
-            self.tabelaDeSimbolos[self.lexema]["posicao"].append((linha, coluna-len(self.lexema)))
+    def resetar(self):
         self.tokens.append(self.lexema)
         self.estadoAtual = "INICIO"
         self.lexema = ""
+
+    def inserirNaTabela(self, linha, coluna):
+        if self.lexema not in self.palavrasReservadas:
+            if self.lexema not in self.tabelaDeSimbolos:
+                self.tabelaDeSimbolos[self.lexema] = {}
+                self.tabelaDeSimbolos[self.lexema]["posicao"] = [(linha, coluna-len(self.lexema))]
+            else:
+                self.tabelaDeSimbolos[self.lexema]["posicao"].append((linha, coluna-len(self.lexema)))
+
+            if self.tipo == "ID": #se for identificador
+                self.lexema = "ident" #troca para "ident"
+            elif self.tipo == "CTN": #se numero constante
+                self.lexema = "int_constant" #troca para "int_constante"
+            elif self.tipo == "CTF": #se float constante
+                self.lexema = "float_constant" #troca para "float_constante"
+            elif self.tipo == "ST": #se string constante
+                self.lexema = "string_constant" #troca para "string_constante"
+        self.resetar()
 
     def erro(self, linha, coluna):
         print(f"ERRO LÉXICO NA LINHA {linha} E COLUNA {coluna} -> '{self.lexema}'")
