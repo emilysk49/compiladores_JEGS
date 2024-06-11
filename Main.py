@@ -1,5 +1,6 @@
 from Gramatica_em_dicionario import *
 from analisador_sintatico import *
+from analisador_lexico import *
 
 class GLC():
     def __init__(self, NTs, Ts, Ps, S):
@@ -8,9 +9,12 @@ class GLC():
         self.Ps = Ps
         self.S = S
 
+al = AnalisadorLexico()
+al.executar("testeSimples.txt")
+
 Trab = GLC(NTs, Terminais, Producoes, "PROGRAM")
 
-codigo = [
+"""codigo = [
     "def", "ident", "(", "int", "ident", ",", "int", "ident", ")", "{", 
         "int", "ident", ";",
         "ident", "=", "ident", "+", "ident", ";",
@@ -24,8 +28,8 @@ codigo = [
         "int", "ident", ";", 
         "ident", "=", "ident", "(", "ident", ",", "ident", ")", ";", 
     "}"
-]
-
-result = analisador_sintatico(Trab, LL1Predict, LL1Action, codigo)
+]"""
+print(al.tokens)
+result = analisador_sintatico(Trab, LL1Predict, LL1Action, al.tokens)
 print(result)
 

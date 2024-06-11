@@ -14,12 +14,13 @@ class AnalisadorLexico:
         self.palavrasReservadas = [
             "def", "int", "float", "string",
             "break", "print", "read", "return",
-            "if", "else", "for", "new", "null"
+            "if", "else", "for", "new", "null", "endif"
             ]
         self.comparadores = ["<",">","!","="]
         self.simbolosEspeciais = ["(",")","[","]","{","}",";",","]
         self.operadores = ["+","-","/","*","%"]
         self.lexema = ""
+        self.tokens = []
 
     def executar(self, entrada):
         linhaAtual = 0
@@ -30,7 +31,7 @@ class AnalisadorLexico:
                 for caracter in linha:
                     colunaAtual += 1
                     self.automatoFinito(caracter,linhaAtual,colunaAtual)
-        return self.tabelaDeSimbolos
+        #return self.tabelaDeSimbolos
 
 
     def automatoFinito(self, caracter, linha, coluna):
@@ -124,17 +125,16 @@ class AnalisadorLexico:
             self.tabelaDeSimbolos[self.lexema]["posicao"] = [(linha, coluna-len(self.lexema))]
         else:
             self.tabelaDeSimbolos[self.lexema]["posicao"].append((linha, coluna-len(self.lexema)))
+        self.tokens.append(self.lexema)
         self.estadoAtual = "INICIO"
         self.lexema = ""
 
     def erro(self, linha, coluna):
-        print(f"ERRO LÉXICO NA LINHA {linha} E COLUNA {coluna}")
+        print(f"ERRO LÉXICO NA LINHA {linha} E COLUNA {coluna} -> '{self.lexema}'")
         self.estadoAtual = "INICIO"
         self.lexema = ""
 
 
-al = AnalisadorLexico()
-print(al.executar("testeSimples.txt"))
+#al = AnalisadorLexico()
+#print(al.executar("testeSimples.txt"))
 #print(al.executar("causaErroLexico.txt"))
-            
-            
