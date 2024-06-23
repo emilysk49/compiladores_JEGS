@@ -21,6 +21,7 @@ class AnalisadorLexico:
         self.operadores = ["+","-","/","*","%"]
         self.lexema = ""
         self.tokens = []
+        self.posicoesLexemasDaTabelaDeSimbolos = {}
 
     def executar(self, entrada):
         linhaAtual = 0
@@ -31,7 +32,6 @@ class AnalisadorLexico:
                 for caracter in linha:
                     colunaAtual += 1
                     self.automatoFinito(caracter,linhaAtual,colunaAtual)
-        #return self.tabelaDeSimbolos
 
 
     def automatoFinito(self, caracter, linha, coluna):
@@ -126,6 +126,8 @@ class AnalisadorLexico:
             else:
                 self.tabelaDeSimbolos[self.lexema]["posicao"].append((linha, coluna-len(self.lexema)))
 
+            self.posicoesLexemasDaTabelaDeSimbolos[str(len(self.tokens))] = self.lexema
+
             if self.tipo == "ID": #se for identificador
                 self.lexema = "ident" #troca para "ident"
             elif self.tipo == "CTN": #se numero constante
@@ -140,8 +142,3 @@ class AnalisadorLexico:
         print(f"ERRO LÉXICO NA LINHA {linha} E COLUNA {coluna} -> '{self.lexema}'")
         self.estadoAtual = "INICIO"
         self.lexema = ""
-
-
-#al = AnalisadorLexico()
-#print(al.executar("testeSimples.txt"))
-#print(al.executar("causaErroLexico.txt"))
