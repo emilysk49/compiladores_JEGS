@@ -13,10 +13,14 @@ class GLC():
         self.epsilon = epsilon
 
 AL = AnalisadorLexico()
-AL.executar("testeInsercaoTipo.txt")
+AL.executar("testeArvoreExpressao.txt")
 
 Trab = GLC(NTs, Terminais, Producoes, AcoesSemanticas, PROGRAM, CIFRAO, EPSILON)
 
-result = analisador_sintatico(Trab, LL1Predict, LL1Action, AL.tokens, AL.posicoesLexemasDaTabelaDeSimbolos, AL.tabelaDeSimbolos)
+lista_de_nodos = []
+result = analisador_sintatico(Trab, LL1Predict, LL1Action, AL.tokens, AL.posicoesLexemasDaTabelaDeSimbolos, AL.tabelaDeSimbolos, lista_de_nodos)
+
+for nodo in lista_de_nodos:
+    print(nodo)
 print(result)
 print(AL.tabelaDeSimbolos)

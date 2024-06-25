@@ -1,4 +1,4 @@
-def analisador_sintatico(glc, predicts, actions, codigo, posicoes_lexemas_na_tabela_de_simbolos, tabela_de_simbolos):
+def analisador_sintatico(glc, predicts, actions, codigo, posicoes_lexemas_na_tabela_de_simbolos, tabela_de_simbolos, lista_de_nodos):
     pilha = [glc.cifrao, glc.S]
     codigo += ['$']
     cabecote = 0
@@ -18,6 +18,7 @@ def analisador_sintatico(glc, predicts, actions, codigo, posicoes_lexemas_na_tab
                     acao_semantica.lexeme = posicoes_lexemas_na_tabela_de_simbolos[cabecote_str]
 
                 acao_semantica.symbol_table = tabela_de_simbolos
+                acao_semantica.nodes_list = lista_de_nodos
                 acao_semantica.exec()
             else:
                 return codigo[0] + " Inesperado, posiçãoA " + str(cabecote)
