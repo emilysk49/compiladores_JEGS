@@ -1,0 +1,8 @@
+def funcao() {
+    int a;
+    int b;
+    a = 1;
+    b = 25;
+    a = a + 35 - b * 2;
+    print 10 * b;
+}
