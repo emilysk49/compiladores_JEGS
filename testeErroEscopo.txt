@@ -1,0 +1,4 @@
+def funcao(int a, int b) {
+    int c;
+    int c;
+}
