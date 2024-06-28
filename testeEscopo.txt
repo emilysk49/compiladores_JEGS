@@ -1,0 +1,13 @@
+def funcao(int a, int b) {
+    int c;
+    int d;
+    b = c + d + 5 - 2;
+    int e;
+    for (e = 0; e < 5; e = e + 1) {
+        int g;
+        int d;
+        d = 0;
+        g = 4;
+        d = g + d;
+    }
+}

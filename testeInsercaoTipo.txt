@@ -1,0 +1,8 @@
+def funcao(int d, float e, string f){
+    int x;
+    int y[1][2][3];
+    float z;
+    float a[3][3];
+    string b;
+    string c[2][3];
+}
