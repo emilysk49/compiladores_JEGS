@@ -9,7 +9,7 @@ class AcaoSemantica:
         self.tables_stack = None
 
     def exec(self):
-        self.fn(self.params, self.lexeme, self.symbol_table, self.nodes_list, self.tables_stack)
+        return self.fn(self.params, self.lexeme, self.symbol_table, self.nodes_list, self.tables_stack)
 
 class Node:
     def __init__(self, value, left, right):
@@ -60,7 +60,7 @@ def set_lexeme_or_throw_error(attr_list, _1, _2, _3, tables_stack):
     table = tables_stack[-1]
     # if table[IDENT.vars["lexeme"]] -> erro
     if attr_list[0].vars[attr_list[1]] in table:
-        return "Erro"
+        return "Erro inesperado. Nome já declarado no mesmo escopo!"
     table[attr_list[0].vars[attr_list[1]]] = 1
 
 def close_TS(attr_list, _1, _2, _3, tables_stack):
