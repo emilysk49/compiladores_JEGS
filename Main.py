@@ -20,7 +20,7 @@ Trab = GLC(NTs, Terminais, Producoes, AcoesSemanticas, PROGRAM, CIFRAO, EPSILON)
 lista_de_nodos = []
 result = analisador_sintatico(Trab, LL1Predict, LL1Action, AL.tokens, AL.posicoesLexemasDaTabelaDeSimbolos, AL.tabelaDeSimbolos, lista_de_nodos)
 
-for nodo in lista_de_nodos:
-    print(nodo)
+#for nodo in lista_de_nodos:
+    #print(nodo)
 print(result)
 print(AL.tabelaDeSimbolos)
