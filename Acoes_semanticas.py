@@ -1,3 +1,8 @@
+import re
+
+INVALID_TYPES_ERROR = "Erro semântico: Tipos inválidos!"
+NAME_ALREADY_DECLARED_ERROR = "Erro semântico: Nome já declarado no mesmo escopo!"
+
 class AcaoSemantica:
     def __init__(self, fn, params):
         self.name = "acao_semantica"
@@ -60,7 +65,7 @@ def set_lexeme_or_throw_error(attr_list, _1, _2, _3, tables_stack):
     table = tables_stack[-1]
     # if table[IDENT.vars["lexeme"]] -> erro
     if attr_list[0].vars[attr_list[1]] in table:
-        return "Erro inesperado. Nome já declarado no mesmo escopo!"
+        return NAME_ALREADY_DECLARED_ERROR
     table[attr_list[0].vars[attr_list[1]]] = 1
 
 def close_TS(attr_list, _1, _2, _3, tables_stack):
@@ -75,8 +80,7 @@ def insert_type_into_table_with_index(attr_list, _1, symbol_table, _2, _3):
     symbol_table[attr_list[0].vars[attr_list[1]]][attr_list[2]] = f"{attr_list[3].vars[attr_list[4]]} {attr_list[5].vars[attr_list[6]]}"
 
 def insert_type_into_table_without_index(attr_list, _1, symbol_table, _2, _3):
-    # symbol_table[IDENT.vars["lexeme"]]["type"] = TYPE.vars["type"] -> int
-    symbol_table[attr_list[0].vars[attr_list[1]]][attr_list[2]] = f"{attr_list[3].vars[attr_list[4]]}"
+    symbol_table[attr_list[0].vars[attr_list[1]]][attr_list[2]] = f"{attr_list[3].vars[attr_list[4]]} 0"
 
 def set_lexeme(attr_list, lexeme, _1, _2, _3):
     # IDENT.vars["lexeme"] = "b" 
@@ -91,5 +95,28 @@ def set_var_based_on_existing(attr_list, _1, _2, _3, _4):
     attr_list[0].vars[attr_list[1]] = attr_list[0].vars[attr_list[2]]
 
 def set_var_sum(attr_list, _1, _2, _3, _4):
-    # TYPE.vars["final"] = TYPE.vars["atual"] + 1
     attr_list[0].vars[attr_list[1]] = attr_list[0].vars[attr_list[2]] + attr_list[3]
+
+def set_type_or_throw_error(attr_list, _1, _2, _3, _4):
+    if attr_list[2].vars[attr_list[3]] != "" and attr_list[2].vars[attr_list[3]] != attr_list[4].vars[attr_list[5]]:
+        return INVALID_TYPES_ERROR
+    attr_list[0].vars[attr_list[1]] = attr_list[4].vars[attr_list[5]]
+
+def set_triple_type_or_throw_error(attr_list, _1, _2, _3, _4):
+    if attr_list[2].vars[attr_list[3]] != "" and attr_list[4].vars[attr_list[5]] != "" and attr_list[2].vars[attr_list[3]] != attr_list[4].vars[attr_list[5]]:
+        return INVALID_TYPES_ERROR
+
+    if attr_list[4].vars[attr_list[5]] != "" and attr_list[6].vars[attr_list[7]] != "" and attr_list[4].vars[attr_list[5]] != attr_list[6].vars[attr_list[7]]:
+        return INVALID_TYPES_ERROR
+
+    if attr_list[2].vars[attr_list[3]] != "" and attr_list[6].vars[attr_list[7]] != "" and attr_list[2].vars[attr_list[3]] != attr_list[6].vars[attr_list[7]]:
+        return INVALID_TYPES_ERROR
+
+    attr_list[0].vars[attr_list[1]] = attr_list[2].vars[attr_list[3]] or attr_list[4].vars[attr_list[5]] or attr_list[6].vars[attr_list[7]]
+
+def set_variable_type_based_on_ident(attr_list, _1, symbol_table, _2, _3):
+    type_and_depth = symbol_table[attr_list[2].vars[attr_list[3]]][attr_list[4]]
+    var_type, depth, _ = re.split('(\d+)', type_and_depth)
+
+    var_depth = attr_list[5].vars[attr_list[6]]
+    attr_list[0].vars[attr_list[1]] = f"{var_type}{int(depth) - var_depth}"

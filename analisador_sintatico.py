@@ -21,9 +21,10 @@ def analisador_sintatico(glc, predicts, actions, codigo, posicoes_lexemas_na_tab
                 acao_semantica.symbol_table = tabela_de_simbolos
                 acao_semantica.nodes_list = lista_de_nodos
                 acao_semantica.tables_stack = tables_stack
+
                 erro = acao_semantica.exec()
                 if erro:
-                    return erro + f" Posição: {str(cabecote)}"
+                    return f"{erro} Posição: {str(cabecote)}"
             else:
                 return codigo[0] + " Inesperado, posiçãoA " + str(cabecote)
         else:

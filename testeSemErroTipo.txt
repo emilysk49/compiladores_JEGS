@@ -1,0 +1,9 @@
+def funcao() {
+    int a[2];
+    int b;
+    int c;
+    b = 1;
+    c = 2;
+    a[1] = 2;
+    a[0] = a[1] + 35 - b * 2;
+}

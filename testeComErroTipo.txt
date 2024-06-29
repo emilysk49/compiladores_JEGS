@@ -1,0 +1,5 @@
+def funcao() {
+    int a[2];
+    string b;
+    a = a[0] + -1 - b * "teste";
+}
