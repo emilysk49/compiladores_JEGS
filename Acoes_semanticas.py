@@ -2,6 +2,7 @@ import re
 
 INVALID_TYPES_ERROR = "Erro semântico: Tipos inválidos!"
 NAME_ALREADY_DECLARED_ERROR = "Erro semântico: Nome já declarado no mesmo escopo!"
+BREAK_OUTSIDE_FOR_ERROR = "Erro semântico: Break fora do escopo de um comando de repetição!"
 
 class AcaoSemantica:
     def __init__(self, fn, params):
@@ -120,3 +121,12 @@ def set_variable_type_based_on_ident(attr_list, _1, symbol_table, _2, _3):
 
     var_depth = attr_list[5].vars[attr_list[6]]
     attr_list[0].vars[attr_list[1]] = f"{var_type}{int(depth) - var_depth}"
+
+def set_var_of_ts_based_on_another(attr_list, _1, _2, _3, tables_stack):
+    table = tables_stack[-1]
+    table[attr_list[0]] = attr_list[1].vars[attr_list[2]]
+
+def verify_ts_var_or_throw_error(attr_list, _1, _2, _3, tables_stack):
+    table = tables_stack[-1]
+    if attr_list[0] not in table:
+        return BREAK_OUTSIDE_FOR_ERROR
