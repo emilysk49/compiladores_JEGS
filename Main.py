@@ -1,3 +1,4 @@
+import os
 from Gramatica_em_dicionario import *
 from analisador_sintatico import *
 from analisador_lexico import *
@@ -12,15 +13,17 @@ class GLC():
         self.cifrao = cifrao
         self.epsilon = epsilon
 
+arquivo_teste = os.path.join(os.path.dirname(__file__), "testes", "testeSimples.txt")
+
 AL = AnalisadorLexico()
-AL.executar("testeEscopo.txt")
+AL.executar(arquivo_teste)
 
 Trab = GLC(NTs, Terminais, Producoes, AcoesSemanticas, PROGRAM, CIFRAO, EPSILON)
 
 lista_de_nodos = []
 result = analisador_sintatico(Trab, LL1Predict, LL1Action, AL.tokens, AL.posicoesLexemasDaTabelaDeSimbolos, AL.tabelaDeSimbolos, lista_de_nodos)
 
-#for nodo in lista_de_nodos:
-    #print(nodo)
+# for nodo in lista_de_nodos:
+    # print(nodo)
 print(result)
 print(AL.tabelaDeSimbolos)
