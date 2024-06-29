@@ -43,18 +43,22 @@ def create_node(attr_list, _1, _2, nodes_list, _3):
 def create_expr_node(attr_list, _1, _2, nodes_list, _3):
     # nó("+", IDENT.ident, "-")
     node = Node(attr_list[2], attr_list[3].vars[attr_list[4]], attr_list[5])
+    nodes_list.remove(attr_list[3].vars[attr_list[4]])
     nodes_list.append(node)
     attr_list[0].vars[attr_list[1]] = node
 
 def create_term_node(attr_list, _1, _2, nodes_list, _3):
     # nó(SIGN.sign, IDENT.ident, "-")
     node = Node(attr_list[2].vars[attr_list[3]], attr_list[4].vars[attr_list[5]], attr_list[6])
+    nodes_list.remove(attr_list[4].vars[attr_list[5]])
     nodes_list.append(node)
     attr_list[0].vars[attr_list[1]] = node
 
 def create_operation_node(attr_list, _1, _2, nodes_list, _3):
     # nó(SIGN.sign, IDENT.ident, IDENT.ident)
     node = Node(attr_list[2].vars[attr_list[3]], attr_list[4].vars[attr_list[5]], attr_list[6].vars[attr_list[7]])
+    nodes_list.remove(attr_list[4].vars[attr_list[5]])
+    nodes_list.remove(attr_list[6].vars[attr_list[7]])
     nodes_list.append(node)
     attr_list[0].vars[attr_list[1]] = node
 
