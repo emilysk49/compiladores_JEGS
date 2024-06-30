@@ -1,0 +1,109 @@
+def soma(int a, int b) {
+    int resultado;
+    resultado = a + b;
+    return resultado;
+}
+
+def subtracao(int a, int b) {
+    int resultado;
+    resultado = a - b;
+    return resultado;
+}
+
+def multiplicacao(int a, int b) {
+    int resultado;
+    resultado = a * b;
+    return resultado;
+}
+
+def divisao(int a, int b) {
+    if (b == 0) {
+        string erro;
+        erro = "Erro: Divisão por zero";
+        print erro;
+        return erro;
+    }
+    int resultado;
+    resultado = a / b;
+    return resultado;
+}
+
+def potencia(int base, int expoente) {
+    int resultado;
+    resultado = 1;
+    while (expoente > 0) {
+        resultado = resultado * base;
+        expoente = expoente - 1;
+    }
+    return resultado;
+}
+
+def modulo(int a, int b) {
+    int resultado;
+    if (b == 0) {
+        resultado = a;
+        return resultado;
+    }
+    resultado = a % b;
+    return resultado;
+}
+
+def fatorial(int n) {
+    int resultado;
+    if (n == 0) {
+        resultado = 1;
+        return resultado;
+    }
+    resultado = n * fatorial(n - 1); 
+    return resultado;
+}
+
+def calcular(string operacao, int a, int b) {
+    int resultado;
+    if (operacao == "soma") {
+        resultado = soma(a, b);
+    } else if (operacao == "subtracao") {
+        resultado = subtracao(a, b);
+    } else if (operacao == "multiplicacao") {
+        resultado = multiplicacao(a, b);
+    } else if (operacao == "divisao") {
+        resultado = divisao(a, b);
+    } else if (operacao == "potencia") {
+        resultado = potencia(a, b);
+    } else if (operacao == "modulo") {
+        resultado = modulo(a, b);
+    } else {
+        string erro;
+        erro = "Operação desconhecida"; 
+        print erro;
+    }
+    print resultado;
+}
+
+def calcular_fatorial(int n) {
+    int resultado;
+    resultado = fatorial(n);
+    print resultado;
+}
+
+def main() {
+    string operacao;
+    int a;
+    int b;
+
+    int i;
+    for (i = 1; i > 0; i = i + 1) {
+        print "Qual operação desejas que eu calcule?";
+        read operacao;
+        if (operacao == "sair") {
+            break;
+        } else if (operacao == "fatorial") {
+            read a;
+            calcular_fatorial(a);
+        } else {
+            read a;
+            read b;
+            calcular(operacao, a, b);
+        }
+    }
+}
