@@ -120,6 +120,10 @@ def set_triple_type_or_throw_error(attr_list, _1, _2, _3, _4):
     attr_list[0].vars[attr_list[1]] = attr_list[2].vars[attr_list[3]] or attr_list[4].vars[attr_list[5]] or attr_list[6].vars[attr_list[7]]
 
 def set_variable_type_based_on_ident(attr_list, _1, symbol_table, _2, _3):
+    if attr_list[4] not in symbol_table[attr_list[2].vars[attr_list[3]]]:
+        attr_list[0].vars[attr_list[1]] = ""
+        return
+
     type_and_depth = symbol_table[attr_list[2].vars[attr_list[3]]][attr_list[4]]
     var_type, depth, _ = re.split('(\d+)', type_and_depth)
 
