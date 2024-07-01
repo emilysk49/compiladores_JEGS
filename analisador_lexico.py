@@ -88,6 +88,7 @@ class AnalisadorLexico:
         #Estado CP_= (so pode "=" ou nada)
         elif self.estadoAtual == "CP_=":
             if caracter == "=":
+                self.lexema += caracter
                 self.estadoAtual = "CP_ACEITO"
             else:
                 self.resetar()
