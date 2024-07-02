@@ -46,8 +46,12 @@ class AnalisadorLexico:
                 self.lexema += caracter
                 self.tipo = "CTN"
             elif caracter in self.comparadores: #Comparador
-                self.estadoAtual = "CP_="
-                self.lexema += caracter
+                if caracter == "!":
+                    self.estadoAtual = "DIF_="
+                    self.lexema += caracter 
+                else:
+                    self.estadoAtual = "CP_="
+                    self.lexema += caracter
                 self.tipo = "CP"
             elif caracter in self.simbolosEspeciais: #Simbolo Especial
                 self.estadoAtual = "SE_ACEITO"
@@ -89,16 +93,15 @@ class AnalisadorLexico:
         elif self.estadoAtual == "CP_=":
             if caracter == "=":
                 self.estadoAtual = "CP_ACEITO"
-            else:
+                self.lexema += caracter
+            self.resetar()
+            #self.automatoFinito(caracter, linha, coluna)
+        #Estado DIF_= (precisa de = em seguida de !)
+        elif self.estadoAtual == "DIF_=":
+            if caracter == "=":
+                self.lexema += caracter
                 self.resetar()
-                self.automatoFinito(caracter, linha, coluna)
-        #Estado CP_ACEITO (nao pode comparadores)
-        elif self.estadoAtual == "CP_ACEITO":
-            if caracter in self.comparadores:
-                self.erro(linha, coluna)
-            else:
-                self.resetar()
-                self.automatoFinito(caracter, linha, coluna)
+                #self.automatoFinito(caracter, linha, coluna)
         #Estado ST_TUDO* (tudo dentro de aspas valido)
         elif self.estadoAtual == "ST_TUDO*":
             if caracter == "\"": #se eh fecha aspas
