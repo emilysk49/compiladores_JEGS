@@ -76,7 +76,7 @@ BREAK = Variable("break")
 DEF = Variable("def")
 IDENT = Variable("ident")
 NEW = Variable("new") 
-ENDIF = ("endif")
+ENDIF = Variable("endif")
 EPSILON = Variable("&")
 
 OPEN_SQUARE_BRACKET = Variable("[")
