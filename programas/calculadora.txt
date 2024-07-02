@@ -22,7 +22,7 @@ def divisao(int a, int b) {
         erro = "Erro: Divisão por zero";
         print erro;
         return erro;
-    }
+    } endif
     int resultado;
     resultado = a / b;
     return resultado;
@@ -31,7 +31,8 @@ def divisao(int a, int b) {
 def potencia(int base, int expoente) {
     int resultado;
     resultado = 1;
-    while (expoente > 0) {
+    int i;
+    for (i = 0; expoente > 0; i = 0) {
         resultado = resultado * base;
         expoente = expoente - 1;
     }
@@ -43,7 +44,7 @@ def modulo(int a, int b) {
     if (b == 0) {
         resultado = a;
         return resultado;
-    }
+    } endif
     resultado = a % b;
     return resultado;
 }
@@ -53,34 +54,51 @@ def fatorial(int n) {
     if (n == 0) {
         resultado = 1;
         return resultado;
-    }
-    resultado = n * fatorial(n - 1); 
+    } endif
+    int x;
+    x = n - 1;
+    resultado = fatorial(x);
+    resultado = resultado * n;
     return resultado;
 }
 
 def calcular(string operacao, int a, int b) {
     int resultado;
+
     if (operacao == "soma") {
         resultado = soma(a, b);
-    } else if (operacao == "subtracao") {
+    } endif
+
+    if (operacao == "subtracao") {
         resultado = subtracao(a, b);
-    } else if (operacao == "multiplicacao") {
+    } endif
+
+    if (operacao == "multiplicacao") {
         resultado = multiplicacao(a, b);
-    } else if (operacao == "divisao") {
+    } endif
+ 
+    if (operacao == "divisao") {
         resultado = divisao(a, b);
-    } else if (operacao == "potencia") {
+    } endif
+
+    if (operacao == "potencia") {
         resultado = potencia(a, b);
-    } else if (operacao == "modulo") {
+    } endif
+
+    if (operacao == "modulo") {
         resultado = modulo(a, b);
-    } else {
+    } endif
+
+    if (resultado == null) {
         string erro;
         erro = "Operação desconhecida"; 
         print erro;
-    }
+    } endif
+
     print resultado;
 }
 
-def calcular_fatorial(int n) {
+def calcularFatorial(int n) {
     int resultado;
     resultado = fatorial(n);
     print resultado;
@@ -97,13 +115,17 @@ def main() {
         read operacao;
         if (operacao == "sair") {
             break;
-        } else if (operacao == "fatorial") {
+        } endif
+
+        if (operacao == "fatorial") {
             read a;
-            calcular_fatorial(a);
+            int j;
+            j = calcularFatorial(a);
         } else {
             read a;
             read b;
-            calcular(operacao, a, b);
-        }
+            int j;
+            j = calcular(operacao, a, b);
+        } endif
     }
 }
