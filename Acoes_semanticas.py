@@ -69,9 +69,9 @@ def create_TS(attr_list, _1, _2, _3, tables_stack):
 def set_lexeme_or_throw_error(attr_list, _1, _2, _3, tables_stack):
     table = tables_stack[-1]
     # if table[IDENT.vars["lexeme"]] -> erro
-    if attr_list[0].vars[attr_list[1]] in table:
+    if attr_list[0].vars[attr_list[1]][-1] in table:
         return NAME_ALREADY_DECLARED_ERROR
-    table[attr_list[0].vars[attr_list[1]]] = 1
+    table[attr_list[0].vars[attr_list[1]][-1]] = 1
 
 def close_TS(attr_list, _1, _2, _3, tables_stack):
     tables_stack.pop(-1)
@@ -82,14 +82,18 @@ def set_var_based_on_another(attr_list, _1, _2, _3, _4):
 
 def insert_type_into_table_with_index(attr_list, _1, symbol_table, _2, _3):
     # symbol_table[IDENT.vars["lexeme"]]["type"] = TYPE.vars["type"] -> int 0
-    symbol_table[attr_list[0].vars[attr_list[1]]][attr_list[2]] = f"{attr_list[3].vars[attr_list[4]]} {attr_list[5].vars[attr_list[6]]}"
+    symbol_table[attr_list[0].vars[attr_list[1]][-1]][attr_list[2]] = f"{attr_list[3].vars[attr_list[4]]} {attr_list[5].vars[attr_list[6]]}"
 
 def insert_type_into_table_without_index(attr_list, _1, symbol_table, _2, _3):
-    symbol_table[attr_list[0].vars[attr_list[1]]][attr_list[2]] = f"{attr_list[3].vars[attr_list[4]]} 0"
+    symbol_table[attr_list[0].vars[attr_list[1]][-1]][attr_list[2]] = f"{attr_list[3].vars[attr_list[4]]} 0"
 
 def set_lexeme(attr_list, lexeme, _1, _2, _3):
-    # IDENT.vars["lexeme"] = "b" 
-    attr_list[0].vars[attr_list[1]] = lexeme
+    # IDENT.vars["lexemes"].append("b") 
+    attr_list[0].vars[attr_list[1]].append(lexeme)
+
+def reset_lexeme(attr_list, _1, _2, _3, _4):
+    # IDENT.vars["lexemes"].pop()
+    attr_list[0].vars[attr_list[1]].pop()
 
 def set_var(attr_list, _1, _2, _3, _4):
     # TYPE.vars["final_type"] = "int"
@@ -120,12 +124,11 @@ def set_triple_type_or_throw_error(attr_list, _1, _2, _3, _4):
     attr_list[0].vars[attr_list[1]] = attr_list[2].vars[attr_list[3]] or attr_list[4].vars[attr_list[5]] or attr_list[6].vars[attr_list[7]]
 
 def set_variable_type_based_on_ident(attr_list, _1, symbol_table, _2, _3):
-    if attr_list[4] not in symbol_table[attr_list[2].vars[attr_list[3]]]:
+    if attr_list[4] not in symbol_table[attr_list[2].vars[attr_list[3]][-1]]:
         attr_list[0].vars[attr_list[1]] = ""
         return
 
-
-    type_and_depth = symbol_table[attr_list[2].vars[attr_list[3]]][attr_list[4]]
+    type_and_depth = symbol_table[attr_list[2].vars[attr_list[3]][-1]][attr_list[4]]
     var_type, depth, _ = re.split('(\d+)', type_and_depth)
 
     var_depth = attr_list[5].vars[attr_list[6]]
