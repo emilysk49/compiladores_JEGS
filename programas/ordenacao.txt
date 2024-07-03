@@ -1,0 +1,129 @@
+def bubbleSort() {
+    int n[10];
+    read n;
+    int i;
+    for (i = 0; i < 9; i = i + 1) {
+        int j;
+        for (j = 0; j < 10 - i - 1; j = j + 1) {
+            int next;
+            next = j + 1;
+            int a;
+            a = n[j];
+            int b;
+            b = n[next];
+            if (a > b) {
+                n[j] = b;
+                n[next] = a;
+            } endif
+        }
+    }
+
+    for (i = 0; i < n; i = i + 1) {
+        int b;
+        b = n[i];
+        print b;
+    }
+}
+
+def insertionSort() {
+    int n[10];
+    read n;
+    int i;
+    for (i = 0; i < 10; i = i + 1) {
+        int key;
+        key = n[i];
+        int j;
+        j = i - 1;
+        int z;
+        for (z = 0; j >= 0; z = 0) {
+            int m;
+            m = n[j];
+
+            if (m <= key) {
+                break;
+            } endif
+
+            int next;
+            next = j + 1;
+            n[next] = n[j];
+            j = j - 1;
+        }
+
+        int next;
+        next = j + 1;
+        n[next] = key;
+    }
+
+    for (i = 0; i < n; i = i + 1) {
+        int b;
+        b = n[i];
+        print b;
+    } 
+}
+
+def selectionSort() {
+    int n[10];
+    read n;
+    int i;
+    for (i = 0; i < n; i = i + 1) {
+        int minIdx;
+        minIdx = i;
+        int j;
+        for (j = i + 1; j < n; j = j + 1) {
+            if (n[j] < n[minIdx]) {
+                minIdx = j;
+            } endif
+        }
+        int first;
+        first = n[minIdx];
+        int second;
+        second = n[i];
+        n[i] = first;
+        n[minIdx] = second;
+    }
+
+    for (i = 0; i < n; i = i + 1) {
+        int b;
+        b = n[i];
+        print b;
+    } 
+}
+
+def shellSort() {
+    int n[10];
+    read n;
+    
+    int i;
+    for (i = 5; i > 0; i = i / 2) {
+        int j;
+        for (j = i; j < 10; j = j + 1) {
+            int temp;
+            temp = n[j];
+            int m;
+            for (m = j; m >= i; m = m - i) {
+                int s;
+                s = m - i;
+                s = n[s];
+
+                if (s <= temp) {
+                    break;
+                } endif
+
+                n[m] = s;
+            }
+
+            n[j] = temp;
+        }
+    }
+}
+
+def main() {
+    int a;
+    a = bubbleSort();
+    int b;
+    b = insertionSort();
+    int c;
+    c = selectionSort();
+    int d;
+    d = shellSort();
+}
