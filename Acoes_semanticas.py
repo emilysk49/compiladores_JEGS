@@ -4,6 +4,9 @@ INVALID_TYPES_ERROR = "Erro semântico: Tipos inválidos!"
 NAME_ALREADY_DECLARED_ERROR = "Erro semântico: Nome já declarado no mesmo escopo!"
 BREAK_OUTSIDE_FOR_ERROR = "Erro semântico: Break fora do escopo de um comando de repetição!"
 
+contador_rotulo = 0
+contador_registrador = 0
+
 class AcaoSemantica:
     def __init__(self, fn, params):
         self.name = "acao_semantica"
@@ -88,7 +91,7 @@ def insert_type_into_table_without_index(attr_list, _1, symbol_table, _2, _3):
     symbol_table[attr_list[0].vars[attr_list[1]][-1]][attr_list[2]] = f"{attr_list[3].vars[attr_list[4]]} 0"
 
 def set_lexeme(attr_list, lexeme, _1, _2, _3):
-    # IDENT.vars["lexemes"].append("b") 
+    # IDENT.vars["lexemes"].append("b")
     attr_list[0].vars[attr_list[1]].append(lexeme)
 
 def reset_lexeme(attr_list, _1, _2, _3, _4):
@@ -124,7 +127,13 @@ def set_triple_type_or_throw_error(attr_list, _1, _2, _3, _4):
     attr_list[0].vars[attr_list[1]] = attr_list[2].vars[attr_list[3]] or attr_list[4].vars[attr_list[5]] or attr_list[6].vars[attr_list[7]]
 
 def set_variable_type_based_on_ident(attr_list, _1, symbol_table, _2, _3):
+    # Exemplo para ação SET_LVALUE_TYPE
+    # LVALUE = attr[0]
+    # 1-type, 3-lexemes, 4-type, 6-depth
+    # IDENT = attr[2]
+    # APPNUM = attr[5]
     if attr_list[4] not in symbol_table[attr_list[2].vars[attr_list[3]][-1]]:
+        # if 'type' not in symbol_table[IDENT.vars['lexemes'][-1]]
         attr_list[0].vars[attr_list[1]] = ""
         return
 
@@ -142,3 +151,209 @@ def verify_ts_var_or_throw_error(attr_list, _1, _2, _3, tables_stack):
     table = tables_stack[-1]
     if attr_list[0] not in table:
         return BREAK_OUTSIDE_FOR_ERROR
+
+
+
+
+
+# Criar regras semânticas e colocar elas na gramática depois
+
+def Tree_Look(node, codigo):
+    if node == None:
+        return
+    if node.lexeme in ['+', '-']:
+        Tree_Look(node.left, codigo)
+        Tree_Look(node.right, codigo)
+        reg1 = node.left.resultReg
+        if node.right == None:
+            if node.lexeme == '-':
+                codigo += [reg1 + ' = -' + reg1]
+            node.resultReg = reg1
+            return
+        reg2 = node.right.resultReg
+
+        resultReg = novoRegistrador()
+
+        codigo += [resultReg + ' = ' + reg1 + node.lexeme + reg2]
+
+        node.resultReg = resultReg
+        return
+    elif node.lexeme in ['*', '/', '%']:
+        Tree_Look(node.left, codigo)
+        Tree_Look(node.right, codigo)
+        reg1 = node.left.resultReg
+        reg2 = node.right.resultReg
+
+        resultReg = novoRegistrador()
+
+        codigo += [resultReg+' = ' + reg1 + node.lexeme + reg2]
+
+        node.resultReg = resultReg
+    elif node.lexeme in ['>', '<', '>=', '<=', '==', '!=']:
+        Tree_Look(node.left, codigo)
+        Tree_Look(node.right, codigo)
+        reg1 = node.left.resultReg
+        reg2 = node.right.resultReg
+
+        comparison = reg1 + node.lexeme + reg2
+        node.resultReg = comparison
+        return
+    elif node.lexeme == 'none':
+        node.resultReg = 'none'
+    else:
+        reg1 = novoRegistrador()
+        codigo += [reg1 + ' = ' + str(node.lexeme)]
+        node.resultReg = reg1
+
+# EXPRESSION -> NUMEXPRESSION MORENUMEXP {GCI_expression}
+# ATRIBSTAT -> LVALUE = RESULT {GCI_result} {GCI_atribstat}
+def GCI_math(attr_list, _1, _2, _3):
+    RESULT = attr_list[0] # RESULT pode ser um EXPRESSION
+    root = RESULT.vars['node']
+    codigoNovo = []
+    Tree_Look(root, codigoNovo)
+    # To-do: Converter lista de assembly em uma única string no GCI_math
+    RESULT.vars['codigo'] = codigoNovo
+    RESULT.vars['lastReg'] = root.resultReg # O registrador que guarda o valor completo desse Result
+    # lastReg será uma comparação em caso de EXPRESSION, então não terá um registrador. ex: "t3 > t5"
+
+# ATRIBSTAT -> LVALUE {subir_lvalue_lexeme} = RESULT {GCI_result} {GCI_atribstat}
+def GCI_atribstat(attr_list, _1, _2, _3):
+    ATRIBSTAT = attr_list[0]
+    LVALUE = attr_list[1]
+    RESULT = attr_list[2]
+    # duvida: Aparentemente o lexeme é uma lista? Como faço para pegar só o lexema inteiro daquele ident?
+    codigoNovo = str(LVALUE.lexeme) + ' = ' + RESULT.vars['lastReg']
+    ATRIBSTAT.vars['codigo'] = RESULT.vars['codigo'] + codigoNovo
+
+# LVALUE -> IDENT {subir_lvalue_lexeme} APPNUM
+def subir_lvalue_lexeme(attr_list, _1, _2, _3):
+    LVALUE = attr_list[0]
+    IDENT = attr_list[1]
+    LVALUE.vars['lexeme'] = IDENT.vars['lexeme']
+
+# PROGRAM -> STATEMENT
+# PROGRAM -> FUNCLIST
+def subir_program(attr_list, _1, _2, _3):
+    PROGRAM = attr_list[0]
+    CODSTAT = attr_list[1]
+    PROGRAM.vars['codigo'] = CODSTAT.vars['codigo']
+
+# FUNCLIST -> FUNCDEF FUNCLIST'
+def subir_funclist(attr_list, _1, _2, _3):
+    FUNCLIST = attr_list[0]
+    FUNCDEF = attr_list[1]
+    FUNCLISTX = attr_list[2]
+    FUNCLIST.vars['codigo'] = FUNCDEF.vars['codigo'] + FUNCLISTX.vars['codigo']
+    
+# FUNCLIST' -> FUNCLIST
+# FUNCLIST' -> &
+def subir_funclistx(attr_list, _1, _2, _3):
+    FUNCLISTX = attr_list[0]
+    FUNCLIST = attr_list[1]
+    #if FUNCLIST != "&":
+    FUNCLISTX.vars['codigo'] = FUNCLIST.vars['codigo']
+    #else
+    #   FUNCLISTX.vars['codigo'] = ''
+
+# FUNCDEF -> def ident(PARAMLIST) {STATELIST}
+def subir_funcdef(attr_list, _1, _2, _3):
+    FUNCDEF = attr_list[0]
+    STATELIST = attr_list[1]
+    FUNCDEF.vars['codigo'] = STATELIST.vars['codigo']
+
+# STATELIST -> STATEMENT MORESTATELIST
+def subir_statelist(attr_list, _1, _2, _3):
+    STATELIST = attr_list[0]
+    STATEMENT = attr_list[1]
+    MORESTATLIST = attr_list[2]
+    #if MORESTATLIST != '&':
+    STATELIST.vars['codigo'] = STATEMENT.vars['codigo'] + MORESTATLIST.vars['codigo']
+    #else:
+    #    STATELIST.vars['codigo'] = STATEMENT.vars['codigo']
+    
+# MORESTATLIST -> STATELIST
+# MORESTATLIST -> &
+def subir_morestatlist(attr_list, _1, _2, _3):
+    MORESTATLIST = attr_list[0]
+    STATELIST = attr_list[1]
+    #if STATELIST != "&":
+    MORESTATLIST.vars['codigo'] = STATELIST.vars['codigo']
+    #else
+    #   MORESTATLIST.vars['codigo'] = ''
+
+# STATEMENT -> IFSTAT; {subir_statement}
+# STATEMENT -> FORSTAT; {subir_statement}
+# STATEMENT -> ATRIBSTAT; {subir_statement}
+def subir_statement(attr_list, _1, _2, _3):
+    STATEMENT = attr_list[0]
+    CODSTAT = attr_list[1]
+    STATEMENT.vars['codigo'] = CODSTAT.vars['codigo']
+
+# MORESTAT -> else STATEMENT
+# MORESTAT -> &
+def subir_morestat(attr_list, _1, _2, _3):
+    MORESTAT = attr_list[0]
+    ELSE = attr_list[1]
+    #if ELSE != "&":
+    MORESTAT.vars['codigo'] = ELSE.vars['codigo']
+    #else:
+    #    MORESTAT.vars['codigo'] = ''
+
+# IFSTAT -> if {cria_label} (EXPRESSION) STATEMENT MORESTAT endif {GCI_if}
+# def GCI_
+
+# IFSTAT -> if (EXPRESSION) STATEMENT MORESTAT endif {GCI_if}
+def GCI_if(attr_list, _1, _2, _3):
+    IFSTAT = attr_list[0]
+    EXPRESSION = attr_list[1]
+    STATEMENT = attr_list[2]
+    MORESTAT = attr_list[3]
+    if_falso = novoRotulo()
+    if_prox = novoRotulo()
+    #se tem else
+    if (MORESTAT.vars['codigo'] != ''):
+        codigo = (f"{EXPRESSION.vars['codigo']}\n"
+                  f"if False {EXPRESSION.vars['lastReg']} goto {if_falso}\n"
+                  f"{STATEMENT.vars['codigo']}\n"
+                  f"{if_falso}: {MORESTAT.vars['codigo']}\n")
+    #se nao tem else
+    else:
+        codigo = (f"{EXPRESSION.vars['codigo']}\n"
+                  f"if False {EXPRESSION.vars['lastReg']} goto {if_prox}\n"
+                  f"{STATEMENT.vars['codigo']}\n"
+                  f"{if_prox}: ")
+        
+    IFSTAT.vars['codigo'] = codigo
+
+#FORSTAT → for ( ATRIBSTAT1 ; EXPRESSION ; ATRIBSTAT2 ) STATEMENT {GCI_for}
+def GCI_for(attr_list, _1, _2, _3):
+    FORSTAT = attr_list[0]
+    ATRIBSTAT1 = attr_list[1]
+    EXPRESSION = attr_list[2]
+    ATRIBSTAT2 = attr_list[3]
+    STATEMENT = attr_list[4]
+    for_prox = novoRotulo()
+    for_inicio = novoRotulo()
+    
+    codigo = (f"{ATRIBSTAT1.vars['codigo']}\n"
+              f"{for_inicio}: {EXPRESSION.vars['codigo']}\n"
+              f"if False {EXPRESSION.vars['lastReg']} goto {for_prox}\n"
+              f"{STATEMENT.vars['codigo']}\n"
+              f"{ATRIBSTAT2.vars['codigo']}\n"
+              f"goto {for_inicio}\n"
+              f"{for_prox}: ")
+    
+    FORSTAT.vars['codigo'] = codigo
+
+def novoRegistrador():
+    global contador_registrador
+    registrador = f"t{contador_registrador}"
+    contador_registrador += 1
+    return registrador
+
+def novoRotulo():
+    global contador_rotulo
+    label = f"Label{contador_rotulo}"
+    contador_rotulo += 1
+    return label

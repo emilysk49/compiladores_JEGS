@@ -368,7 +368,7 @@ LL1Predict = {
     "FUNCLIST" : {
         'def': 3,
     },
-    "FUNCLIST'" : {
+    "FUNCLIST\'" : {
         'def': 4,
         '$': 5
     },

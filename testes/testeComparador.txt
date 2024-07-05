@@ -1,0 +1,9 @@
+def main() {
+    int x;
+    int novo;
+    int b;
+    x = 6;
+    if (x > 5*2) {
+        b = 3;
+    } endif
+}
