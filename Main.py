@@ -16,7 +16,7 @@ class GLC():
         self.cifrao = cifrao
         self.epsilon = epsilon
 
-arquivo_teste = os.path.join(os.path.dirname(__file__), "testes", "testeComparador.txt")
+arquivo_teste = os.path.join(os.path.dirname(__file__), "programas", "jogodaforca.txt")
 
 AL = AnalisadorLexico()
 AL.executar(arquivo_teste)
