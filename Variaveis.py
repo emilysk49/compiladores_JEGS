@@ -81,6 +81,7 @@ NEW = Variable("new")
 ENDIF = Variable("endif")
 EPSILON = Variable("&")
 
+
 OPEN_SQUARE_BRACKET = Variable("[")
 CLOSING_SQUARE_BRACKET = Variable("]")
 OPEN_CURLY_BRACKET = Variable("{")

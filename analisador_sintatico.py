@@ -4,6 +4,7 @@ def analisador_sintatico(glc, predicts, actions, codigo, posicoes_lexemas_na_tab
     tables_stack = [{}]
     cabecote = 0
 
+
     while pilha != []:
         if pilha[-1].name not in glc.Ps:
             if pilha[-1].name == codigo[0]:
@@ -11,7 +12,7 @@ def analisador_sintatico(glc, predicts, actions, codigo, posicoes_lexemas_na_tab
                 codigo.pop(0)
                 cabecote += 1
                 continue
-            elif pilha[-1] in glc.As:
+            elif pilha[-1] in glc.As: # Análise semântica + Geração de código intermediário
                 acao_semantica = pilha.pop(-1)
 
                 cabecote_str = str(cabecote)
