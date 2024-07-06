@@ -16,15 +16,18 @@ class GLC():
         self.cifrao = cifrao
         self.epsilon = epsilon
 
-arquivo_teste = os.path.join(os.path.dirname(__file__), "testes", "testeComparador.txt")
+arquivo_teste = os.path.join(os.path.dirname(__file__), "testes", "geracaoCodigoIntermediario.txt")
 
 AL = AnalisadorLexico()
 AL.executar(arquivo_teste)
 
 Trab = GLC(NTs, Terminais, Producoes, AcoesSemanticas, PROGRAM, CIFRAO, EPSILON)
 
+
 lista_de_nodos = []
 result = analisador_sintatico(Trab, LL1Predict, LL1Action, AL.tokens, AL.posicoesLexemasDaTabelaDeSimbolos, AL.tabelaDeSimbolos, lista_de_nodos)
+
+
 
 
 if result == "Sucesso!":
@@ -46,7 +49,7 @@ if result == "Sucesso!":
     print("============================\n")
 
     print("=== Código intermediário ===")
-    print("Coming soon...")
+    print(PROGRAM.vars['codigo'])
     print("============================")
 else:
     print(result)
