@@ -9,7 +9,7 @@ contador_registrador = 0
 
 class AcaoSemantica:
     def __init__(self, fn, params):
-        self.name = "acao_semantica"
+        self.name = "acao"
         self.fn = fn
         self.params = params
         self.lexeme = None
@@ -36,9 +36,14 @@ class Node:
                 ret += child.__str__(level+1)
         return ret
 
+def create_node_lexeme(attr_list, _1, _2, nodes_list, _3):
+    # nó("a", "-", "-")
+    node = Node(attr_list[2].vars[attr_list[3]][-1], attr_list[4], attr_list[5])
+    nodes_list.append(node)
+    attr_list[0].vars[attr_list[1]] = node
 
 def create_node(attr_list, _1, _2, nodes_list, _3):
-    # nó("int_constant", "-", "-")
+    # nó("ident", "-", "-")
     node = Node(attr_list[2], attr_list[3], attr_list[4])
     nodes_list.append(node)
     attr_list[0].vars[attr_list[1]] = node
@@ -154,11 +159,7 @@ def verify_ts_var_or_throw_error(attr_list, _1, _2, _3, tables_stack):
 
 
 
-
-
-
-
-
+# Geração de código intermediário
 def Tree_Look(node, codigo):
     if node == None:
         return
@@ -229,15 +230,14 @@ def GCI_atribstat(attr_list, _1, _2, _3, _4):
     ATRIBSTAT = attr_list[0]
     LVALUE = attr_list[1]
     RESULT = attr_list[2]
-    # duvida: Aparentemente o lexeme é uma lista? Como faço para pegar só o lexema inteiro daquele ident?
-    codigoNovo = str(LVALUE.vars['lexemes']) + ' = ' + RESULT.vars['lastReg']
+    codigoNovo = str(LVALUE.vars['lexemes'][-1]) + ' = ' + RESULT.vars['lastReg']
     ATRIBSTAT.vars['codigo'] = RESULT.vars['codigo'] + codigoNovo
 
 # LVALUE -> IDENT {subir_lvalue_lexeme_IDENT} APPNUM
 def subir_lvalue_lexeme(attr_list, _1, _2, _3, _4):
     LVALUE = attr_list[0]
     IDENT = attr_list[1]
-    LVALUE.vars['lexemes'] = IDENT.vars['lexemes'][-1]
+    LVALUE.vars['lexemes'].append(IDENT.vars['lexemes'][-1])
 
 # PROGRAM -> STATEMENT {codigo_subir_program_statement}
 # PROGRAM -> FUNCLIST {codigo_subir_program_funclist}
@@ -274,8 +274,6 @@ def subir_statement_statelist(attr_list, _1, _2, _3, _4):
     STATELIST = attr_list[0]
     STATEMENT = attr_list[1]
     STATEMENT.vars['codigo'] = STATELIST.vars['codigo']
-
-
 
 # STATELIST -> STATEMENT MORESTATELIST {codigo_subir_statelist}
 def subir_statelist(attr_list, _1, _2, _3, _4):
@@ -359,8 +357,6 @@ def GCI_for(attr_list, _1, _2, _3, _4):
 def GCI_vazio(attr_list, _1, _2, _3, _4):
     VAR = attr_list[0]
     VAR.vars['codigo'] = ''
-
-
 
 def novoRegistrador():
     global contador_registrador
