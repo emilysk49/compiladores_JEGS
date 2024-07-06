@@ -1,77 +1,27 @@
-string letrasUsadas[26];
-string palavra[8];
-palavra[0] = "c";
-palavra[1] = "o";
-palavra[2] = "m";
-palavra[3] = "p";
-palavra[4] = "i";
-palavra[5] = "l";
-palavra[6] = "a";
-palavra[7] = "r";
-
-def exibirEstado(string letrasUsadas, string palavra, int tentativasRestantes) {
-    string estado = "";
-    int i;
-    for (i = 0; i < 8; i = i + 1) {
-        string letra;
-        letra = palavra[i];
-        int j;
-        for (j = 0; j < 26; j = j + 1) {
-            if (letra == letrasUsadas[j]) {
-                estado = estado + letra;
-            } else {
-                estado = estado + "_";
-            } endif
-        }
-    }
-    print "Palavra: " + estado + "\n";
-    print "Letras usadas: " + letrasUsadas + "\n";
-
+def exibirTentativas(int tentativasRestantes) {
     if (tentativasRestantes == 5) {
-        print "Tentativas restantes: 5\n";
+        print "Tentativas restantes: 5";
     } endif
 
     if (tentativasRestantes == 4) {
-        print "Tentativas restantes: 4\n";
+        print "Tentativas restantes: 4";
     } endif
 
     if (tentativasRestantes == 3) {
-        print "Tentativas restantes: 3\n";
+        print "Tentativas restantes: 3";
     } endif
 
     if (tentativasRestantes == 2) {
-        print "Tentativas restantes: 2\n";
+        print "Tentativas restantes: 2";
     } endif
 
     if (tentativasRestantes == 1) {
-        print "Tentativas restantes: 1\n";
+        print "Tentativas restantes: 1";
     } endif
 }
 
-def verificarVitoria(string palavra, string letrasUsadas) {
-    int venceu;
-    venceu = 0;
-    int i;
-    for (i = 0; i < 26; i = i + 1) {
-        string letraUsada;
-        letraUsada = letrasUsadas[i];
-        int j;
-        for (j = 0; j < 8; j = j + 1) {
-            string letra;
-            letra = palavra[j];
-            if (letraUsada == letra) {
-                venceu = venceu + 1;
-                break;
-            } endif
-        }
-    }
-    if (venceu == 8) {
-        return 1;
-    } endif
-    return 0;
-}
-
-def void jogoDaForca(string letrasUsadas) {
+def jogoDaForca() {
+    string letrasUsadas[26];
     string palavra[8];
     palavra[0] = "c";
     palavra[1] = "o";
@@ -82,72 +32,106 @@ def void jogoDaForca(string letrasUsadas) {
     palavra[6] = "a";
     palavra[7] = "r";
 
-    print "Pegue um papel e uma caneta para anotar as letras usadas! Eu não consigo fazer isso por você! A palavra possui 8 letras!";
+    print "Pegue um papel e uma caneta para anotar as letras usadas! Eu não consigo fazer isso por você! A palavra misteriosa possui 8 letras!";
+
+    int letrasCorretas;
+    letrasCorretas = 0;
 
     int tentativasRestantes;
     for (tentativasRestantes = 5; tentativasRestantes > 0; tentativasRestantes = tentativasRestantes - 1) {
-        exibirEstado(letrasUsadas, palavra, tentativasRestantes);
+        string exibir;
+        exibir = exibirTentativas(tentativasRestantes);
         print "Adivinhe uma letra: ";
         string letra;
-        read(letra);
+        read letra;
 
         int j;
+        int jaFoiUsada;
+        jaFoiUsada = 0;
         for (j = 0; j < 26; j = j + 1) {
             if (letra == letrasUsadas[j]) {
                 print "Você já usou essa letra.";
+                jaFoiUsada = 1;
+                break;
             } endif
         }
 
+        if (jaFoiUsada == 0) {
+            int k;
+            for (k = 0; k < 26; k = k + 1) {     
+                if (letrasUsadas[k] == "") {
+                    letrasUsadas[k] = letra;
+                    break;
+                } endif
+            }
+        } endif
+
         int i;
+        int letraCorreta;
+        letraCorreta = 0;
         for (i = 0; i < 8; i = i + 1) {
             if (letra == palavra[i]) {
+                letraCorreta = 1;
+                letrasCorretas = letrasCorretas + 1;
                 if (i == 0) {
                     print "A letra se encontra na posicao 0";
+                    break;
                 } endif
 
                 if (i == 1) {
                     print "A letra se encontra na posicao 1";
+                    break;
                 } endif
 
                 if (i == 2) {
                     print "A letra se encontra na posicao 2";
+                    break;
                 } endif
 
                 if (i == 3) {
                     print "A letra se encontra na posicao 3";
+                    break;
                 } endif
 
                 if (i == 4) {
                     print "A letra se encontra na posicao 4";
+                    break;
                 } endif
 
                 if (i == 5) {
                     print "A letra se encontra na posicao 5";
+                    break;
                 } endif
 
                 if (i == 6) {
                     print "A letra se encontra na posicao 6";
+                    break;
                 } endif
 
                 if (i == 7) {
                     print "A letra se encontra na posicao 7";
-                } endif
-
-                if (verificarVitoria(palavra, letrasUsadas)) {
-                    print "Parabéns! Você ganhou! A palavra era '" + palavra + "'.\n";
                     break;
                 } endif
-            } else {
-                tentativasRestantes = tentativasRestantes - 1;
             } endif
         }
+        if (letraCorreta == 0) {
+            print "Você errou!";
+            tentativasRestantes = tentativasRestantes - 1;
+        } endif
+
+        if (letrasCorretas == 8) {
+            print "Parabéns! Você descobriu!";
+            break;
+        } endif
 
         if (tentativasRestantes == 0) {
-            print "Você perdeu! A palavra era '" + palavra + "'.\n";
+            print "Você perdeu! A palavra era 'compilar'!";
+            break;
         } endif
     }
 }
 
 def main() {
-    jogoDaForca();
+    int executar;
+    executar = jogoDaForca();
 }
