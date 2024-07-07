@@ -37,7 +37,7 @@ class Node:
         return ret
 
 def create_node_lexeme(attr_list, _1, _2, nodes_list, _3):
-    # nó("a", "-", "-")
+    # nó(IDENT.lexemes[-1], "-", "-")
     node = Node(attr_list[2].vars[attr_list[3]][-1], attr_list[4], attr_list[5])
     nodes_list.append(node)
     attr_list[0].vars[attr_list[1]] = node
@@ -230,8 +230,8 @@ def GCI_atribstat(attr_list, _1, _2, _3, _4):
     ATRIBSTAT = attr_list[0]
     LVALUE = attr_list[1]
     RESULT = attr_list[2]
-    codigoNovo = str(LVALUE.vars['lexemes'][-1]) + ' = ' + RESULT.vars['lastReg']
-    ATRIBSTAT.vars['codigo'] = RESULT.vars['codigo'] + codigoNovo
+    codigoNovo = str(LVALUE.vars['lexemes'][-1]) + ' = ' + RESULT.vars['lastReg'] + '\n'
+    ATRIBSTAT.vars['codigo'] = ATRIBSTAT.vars['codigo_inicial'] + RESULT.vars['codigo'] + codigoNovo
 
 # LVALUE -> IDENT {subir_lvalue_lexeme_IDENT} APPNUM
 def subir_lvalue_lexeme(attr_list, _1, _2, _3, _4):
@@ -246,12 +246,11 @@ def subir_program(attr_list, _1, _2, _3, _4):
     CODSTAT = attr_list[1]
     PROGRAM.vars['codigo'] = CODSTAT.vars['codigo']
 
-# FUNCLIST -> FUNCDEF FUNCLIST' {codigo_subir_funclist}
+# FUNCLIST -> FUNCDEF {codigo_subir_funclist} FUNCLIST'
 def subir_funclist(attr_list, _1, _2, _3, _4):
     FUNCLIST = attr_list[0]
     FUNCDEF = attr_list[1]
-    FUNCLISTX = attr_list[2]
-    FUNCLIST.vars['codigo'] = FUNCDEF.vars['codigo'] + FUNCLISTX.vars['codigo']
+    FUNCLIST.vars['codigo'] += FUNCDEF.vars['codigo']
     
 # FUNCLIST' -> FUNCLIST {codigo_subir_funclistx_funclist}
 # FUNCLIST' -> & {codigo_subir_funclistx_epsilon}
@@ -269,20 +268,30 @@ def subir_funcdef(attr_list, _1, _2, _3, _4):
     STATELIST = attr_list[1]
     FUNCDEF.vars['codigo'] = STATELIST.vars['codigo']
 
-# STATEMENT -> {STATELIST} {codigo_subir_statelist}
-def subir_statement_statelist(attr_list, _1, _2, _3, _4):
-    STATELIST = attr_list[0]
+# HEAD -> BODY {subir_codigo}
+def subir_codigo(attr_list, _1, _2, _3, _4):
+    HEAD = attr_list[0]
+    BODY = attr_list[1]
+    HEAD.vars['codigo'] = BODY.vars['codigo']
+
+# HEAD -> {descer_codigo_inicial} BODY
+def descer_codigo_inicial(attr_list, _1, _2, _3, _4):
+    BODY = attr_list[0]
+    HEAD = attr_list[1]
+    BODY.vars['codigo_inicial'] = HEAD.vars['codigo_inicial']
+
+# STATELIST -> STATEMENT {descer_codigo_final} MORESTATELIST
+def descer_codigo_final(attr_list, _1, _2, _3, _4):
+    MORESTATELIST = attr_list[0]
     STATEMENT = attr_list[1]
-    STATEMENT.vars['codigo'] = STATELIST.vars['codigo']
+    MORESTATELIST.vars['codigo_inicial'] = STATEMENT.vars['codigo']
 
 # STATELIST -> STATEMENT MORESTATELIST {codigo_subir_statelist}
 def subir_statelist(attr_list, _1, _2, _3, _4):
     STATELIST = attr_list[0]
-    STATEMENT = attr_list[1]
-    MORESTATELIST = attr_list[2]
-    STATELIST.vars['codigo'] = STATEMENT.vars['codigo'] + MORESTATELIST.vars['codigo']
-    STATEMENT.vars['codigo'] = ''
-    
+    MORESTATELIST = attr_list[1]
+    STATELIST.vars['codigo'] = MORESTATELIST.vars['codigo']
+
 # MORESTATELIST -> STATELIST {codigo_subir_morestatlist_state}
 # MORESTATELIST -> & {codigo_subir_morestatlist_epsilon}
 def subir_morestatlist(attr_list, _1, _2, _3, _4):
@@ -291,7 +300,7 @@ def subir_morestatlist(attr_list, _1, _2, _3, _4):
     if STATELIST != '':
         MORESTATELIST.vars['codigo'] = STATELIST.vars['codigo']
     else:
-       MORESTATELIST.vars['codigo'] = ''
+       MORESTATELIST.vars['codigo'] = MORESTATELIST.vars['codigo_inicial']
 
 # STATEMENT -> IFSTAT; {codigo_subir_statement_if}
 # STATEMENT -> FORSTAT; {codigo_subir_statement_for}
@@ -299,7 +308,7 @@ def subir_morestatlist(attr_list, _1, _2, _3, _4):
 def subir_statement(attr_list, _1, _2, _3, _4):
     STATEMENT = attr_list[0]
     CODSTAT = attr_list[1]
-    STATEMENT.vars['codigo'] = CODSTAT.vars['codigo']
+    STATEMENT.vars['codigo'] = CODSTAT.vars['codigo'] + STATEMENT.vars['final']
 
 # MORESTAT -> else STATEMENT {codigo_subir_morestat_statement}
 # MORESTAT -> & {codigo_subir_morestat_epsilon}
@@ -330,33 +339,49 @@ def GCI_if(attr_list, _1, _2, _3, _4):
         codigo = (f"{EXPRESSION.vars['codigo']}\n"
                   f"if False {EXPRESSION.vars['lastReg']} goto {if_prox}\n"
                   f"{STATEMENT.vars['codigo']}\n"
-                  f"{if_prox}: ")
+                  f"{if_prox}: \n")
         
     IFSTAT.vars['codigo'] = codigo
 
-#FORSTAT → for ( ATRIBSTAT1 ; EXPRESSION ; ATRIBSTAT2 ) STATEMENT {GCI_FOR}
-def GCI_for(attr_list, _1, _2, _3, _4):
-    FORSTAT = attr_list[0]
-    ATRIBSTAT1 = attr_list[1]
+def descer_codigo_inicial_for(attr_list, _1, _2, _3, _4):
+    STATEMENT = attr_list[0]
+    ATRIBSTAT = attr_list[1]
     EXPRESSION = attr_list[2]
-    ATRIBSTAT2 = attr_list[3]
-    STATEMENT = attr_list[4]
-    for_prox = novoRotulo()
     for_inicio = novoRotulo()
-    
-    codigo = (f"{ATRIBSTAT1.vars['codigo']}\n"
-              f"{for_inicio}: {EXPRESSION.vars['codigo']}\n"
-              f"if False {EXPRESSION.vars['lastReg']} goto {for_prox}\n"
-              f"{STATEMENT.vars['codigo']}\n"
-              f"{ATRIBSTAT2.vars['codigo']}\n"
-              f"goto {for_inicio}\n"
-              f"{for_prox}: ")
-    
-    FORSTAT.vars['codigo'] = codigo
+    for_prox = novoRotulo()
+
+    codigo_inicial = (f"{ATRIBSTAT.vars['codigo']}\n"
+                      f"{for_inicio}: {EXPRESSION.vars['codigo']}\n"
+                      f"if False {EXPRESSION.vars['lastReg']} goto {for_prox}\n")
+    STATEMENT.vars['codigo_inicial'] = codigo_inicial
+
+    codigo_final = (f"goto {for_inicio}\n"
+                    f"{for_prox}: {STATEMENT.vars['final']}\n")
+    STATEMENT.vars['final'] = codigo_final
+
+def descer_final_for(attr_list, _1, _2, _3, _4):
+    STATEMENT = attr_list[0]
+    ATRIBSTAT = attr_list[1]
+
+    codigo_final = (f"{ATRIBSTAT.vars['codigo']}\n"
+                    f"{STATEMENT.vars['final']}\n")
+    STATEMENT.vars['final'] = codigo_final
 
 def GCI_vazio(attr_list, _1, _2, _3, _4):
     VAR = attr_list[0]
     VAR.vars['codigo'] = ''
+
+def GCI_inicial_vazio(attr_list, _1, _2, _3, _4):
+    VAR = attr_list[0]
+    VAR.vars['codigo_inicial'] = ''
+
+def GCI_final_vazio(attr_list, _1, _2, _3, _4):
+    VAR = attr_list[0]
+    VAR.vars['final'] = ''
+
+def subir_codigo_inicial_final(attr_list, _1, _2, _3, _4):
+    STATEMENT = attr_list[0]
+    STATEMENT.vars['codigo'] = STATEMENT.vars['codigo_inicial'] + STATEMENT.vars['final']
 
 def novoRegistrador():
     global contador_registrador

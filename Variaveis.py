@@ -6,6 +6,7 @@ class Variable:
 PROGRAM = Variable("PROGRAM")
 CIFRAO = Variable("$")
 STATEMENT = Variable("STATEMENT")
+STATEMENT.vars['final'] = ''
 FUNCLIST = Variable("FUNCLIST")
 FUNCDEF = Variable("FUNCDEF")
 FUNCLISTX = Variable("FUNCLIST\'")

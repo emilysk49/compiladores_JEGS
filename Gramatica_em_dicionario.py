@@ -8,7 +8,7 @@ CREATE_NULL_NODE = AcaoSemantica(create_node, [FACTORX, "node", "null", None, No
 SET_FACTORX_FROM_EXPRESSION_NODE = AcaoSemantica(set_var_based_on_another, [FACTORX, "node", EXPRESSION, "node"])
 SET_MORENUMEXP_FIRST_NODE_BASED_ON_NUMEXPRESSION = AcaoSemantica(set_var_based_on_another, [MORENUMEXP, "first_node", NUMEXPRESSION, "node"])
 SET_EXPRESSION_FROM_MORENUMEXP_NODE = AcaoSemantica(set_var_based_on_another, [EXPRESSION, "node", MORENUMEXP, "final_node"])
-CREATE_LVALUE_IDENT_NODE = AcaoSemantica(create_node, [LVALUE, "node", "ident", None, None])
+CREATE_LVALUE_LVALUE_NODE = AcaoSemantica(create_node_lexeme, [LVALUE, "node", LVALUE, "lexemes", None, None])
 SET_FACTOR_FROM_FACTORX_NODE = AcaoSemantica(set_var_based_on_another, [FACTOR, "node", FACTORX, "node"])
 SET_FACTOR_FROM_LVALUE_NODE = AcaoSemantica(set_var_based_on_another, [FACTOR, "node", LVALUE, "node"])
 SET_MOREFACTOR_SIGN_FROM_SIGN = AcaoSemantica(set_var_based_on_another, [MOREFACTOR, "sign", SIGN, "sign"])
@@ -41,7 +41,7 @@ SET_MORENUMEXP_FIRST_NODE_BASED_ON_ADDTERM = AcaoSemantica(set_var_based_on_anot
 SET_EXPR_FINAL_NODE = AcaoSemantica(set_var_based_on_another, [EXPR, "final_node", MORENUMEXP, "final_node"])
 CREATE_EXPR_FACTORX_NODE = AcaoSemantica(create_expr_node, [EXPR, "first_node", "+", FACTORX, "node", None])
 SET_RESULT_NODE = AcaoSemantica(set_var_based_on_another, [RESULT, "final_node", EXPR, "final_node"])
-CREATE_RESULTX_IDENT_NODE = AcaoSemantica(create_node, [RESULTX, "first_node", "ident", None, None])
+CREATE_RESULTX_RESULT_NODE = AcaoSemantica(create_node_lexeme, [RESULTX, "first_node", RESULT, "lexemes", None, None])
 CREATE_EXPR_RESULTX_NODE = AcaoSemantica(create_expr_node, [EXPR, "first_node", "+", RESULTX, "first_node", None])
 SET_RESULTX_FINAL_NODE = AcaoSemantica(set_var_based_on_another, [RESULTX, "final_node", EXPR, "final_node"])
 SET_RESULT_FROM_RESULTX_FINAL_NODE = AcaoSemantica(set_var_based_on_another, [RESULT, "final_node", RESULTX, "final_node"])
@@ -115,11 +115,9 @@ GCI_ATRIBSTAT = AcaoSemantica(GCI_atribstat, [ATRIBSTAT, LVALUE, RESULT])
 subir_lvalue_lexeme_IDENT = AcaoSemantica(subir_lvalue_lexeme, [LVALUE, IDENT])
 codigo_subir_program_statement = AcaoSemantica(subir_program, [PROGRAM, STATEMENT])
 codigo_subir_program_funclist = AcaoSemantica(subir_program, [PROGRAM, FUNCLIST])
-codigo_subir_funclist = AcaoSemantica(subir_funclist, [FUNCLIST, FUNCDEF, FUNCLISTX])
-codigo_subir_funclistx_funclist = AcaoSemantica(subir_funclistx, [FUNCLISTX, FUNCLIST])
-codigo_subir_funclistx_epsilon = AcaoSemantica(subir_funclistx, [FUNCLISTX, ''])
+codigo_subir_funclist = AcaoSemantica(subir_funclist, [FUNCLIST, FUNCDEF])
 codigo_subir_funcdef = AcaoSemantica(subir_funcdef, [FUNCDEF, STATELIST])
-codigo_subir_statelist = AcaoSemantica(subir_statelist, [STATELIST, STATEMENT, MORESTATELIST])
+codigo_subir_statelist = AcaoSemantica(subir_statelist, [STATELIST, MORESTATELIST])
 codigo_subir_morestatlist_state = AcaoSemantica(subir_morestatlist, [MORESTATELIST, STATELIST])
 codigo_subir_morestatlist_epsilon = AcaoSemantica(subir_morestatlist, [MORESTATELIST, ''])
 codigo_subir_statement_if = AcaoSemantica(subir_statement, [STATEMENT, IFSTAT])
@@ -128,11 +126,26 @@ codigo_subir_statement_atrib = AcaoSemantica(subir_statement, [STATEMENT, ATRIBS
 codigo_subir_morestat_statement = AcaoSemantica(subir_morestat, [MORESTAT, STATEMENT])
 codigo_subir_morestat_epsilon = AcaoSemantica(subir_morestat, [MORESTAT, ''])
 GCI_IF = AcaoSemantica(GCI_if, [IFSTAT, EXPRESSION, STATEMENT, MORESTAT])
-GCI_FOR = AcaoSemantica(GCI_for, [FORSTAT, ATRIBSTAT, EXPRESSION, ATRIBSTAT, STATEMENT])
-
 program_vazio = AcaoSemantica(GCI_vazio, [PROGRAM])
-statement_vazio = AcaoSemantica(GCI_vazio, [STATEMENT])
-codigo_subir_statement_statelist = AcaoSemantica(subir_statement_statelist, [STATEMENT, STATELIST])
+funclist_vazio = AcaoSemantica(GCI_vazio, [FUNCLIST])
+statement_codigo = AcaoSemantica(subir_codigo_inicial_final, [STATEMENT])
+statelist_vazio = AcaoSemantica(GCI_inicial_vazio, [STATELIST])
+statement_final_vazio = AcaoSemantica(GCI_final_vazio, [STATEMENT])
+
+codigo_subir_statement_statelist = AcaoSemantica(subir_codigo, [STATEMENT, STATELIST])
+codigo_inicial_statement_de_statelist = AcaoSemantica(descer_codigo_inicial, [STATEMENT, STATELIST])
+codigo_inicial_morestatelist_de_statement = AcaoSemantica(descer_codigo_final, [MORESTATELIST, STATEMENT])
+codigo_inicial_statelist_de_morestatelist = AcaoSemantica(descer_codigo_inicial, [STATELIST, MORESTATELIST])
+codigo_inicial_statelist_de_statement = AcaoSemantica(descer_codigo_inicial, [STATELIST, STATEMENT])
+codigo_inicial_forstat_de_statement = AcaoSemantica(descer_codigo_inicial, [FORSTAT, STATEMENT])
+codigo_inicial_atribstat_de_statement = AcaoSemantica(descer_codigo_inicial, [ATRIBSTAT, STATEMENT])
+codigo_inicial_atribstat_de_forstat = AcaoSemantica(descer_codigo_inicial, [ATRIBSTAT, FORSTAT])
+codigo_inicial_statement_em_forstat = AcaoSemantica(descer_codigo_inicial_for, [STATEMENT, ATRIBSTAT, EXPRESSION])
+codigo_final_statement_em_forstat = AcaoSemantica(descer_final_for, [STATEMENT, ATRIBSTAT])
+codigo_subir_forstat_statement = AcaoSemantica(subir_codigo, [FORSTAT, STATEMENT])
+limpar_final_statement = AcaoSemantica(set_var, [STATEMENT, "final", ""])
+limpar_codigo_inicial_atribstat = AcaoSemantica(set_var, [ATRIBSTAT, "codigo_inicial", ""])
+codigo_final_statement_de_inicial = AcaoSemantica(set_var_based_on_existing, [STATEMENT, "codigo", "codigo_inicial"])
 
 AcoesSemanticas = [
     SET_FACTORX_LEXEME,
@@ -141,7 +154,7 @@ AcoesSemanticas = [
     SET_FACTORX_FROM_EXPRESSION_NODE,
     SET_MORENUMEXP_FIRST_NODE_BASED_ON_NUMEXPRESSION,
     SET_EXPRESSION_FROM_MORENUMEXP_NODE,
-    CREATE_LVALUE_IDENT_NODE,
+    CREATE_LVALUE_LVALUE_NODE,
     SET_FACTOR_FROM_FACTORX_NODE,
     SET_FACTOR_FROM_LVALUE_NODE,
     SET_MOREFACTOR_SIGN_FROM_SIGN,
@@ -174,7 +187,7 @@ AcoesSemanticas = [
     SET_EXPR_FINAL_NODE,
     CREATE_EXPR_FACTORX_NODE,
     SET_RESULT_NODE,
-    CREATE_RESULTX_IDENT_NODE,
+    CREATE_RESULTX_RESULT_NODE,
     CREATE_EXPR_RESULTX_NODE,
     SET_RESULTX_FINAL_NODE,
     SET_RESULT_FROM_RESULTX_FINAL_NODE,
@@ -240,8 +253,6 @@ AcoesSemanticas = [
     codigo_subir_program_statement,
     codigo_subir_program_funclist,
     codigo_subir_funclist,
-    codigo_subir_funclistx_funclist,
-    codigo_subir_funclistx_epsilon,
     codigo_subir_funcdef,
     codigo_subir_statelist,
     codigo_subir_morestatlist_state,
@@ -252,26 +263,40 @@ AcoesSemanticas = [
     codigo_subir_morestat_statement,
     codigo_subir_morestat_epsilon,
     GCI_IF,
-    GCI_FOR,
-
     program_vazio,
-    statement_vazio,
-    codigo_subir_statement_statelist
+    funclist_vazio,
+    statement_codigo,
+    statelist_vazio,
+    statement_final_vazio,
+    codigo_subir_statement_statelist,
+    codigo_inicial_statement_de_statelist,
+    codigo_inicial_morestatelist_de_statement,
+    codigo_inicial_statelist_de_morestatelist,
+    codigo_inicial_statelist_de_statement,
+    codigo_inicial_forstat_de_statement,
+    codigo_inicial_atribstat_de_statement,
+    codigo_inicial_atribstat_de_forstat,
+    codigo_inicial_statement_em_forstat,
+    codigo_final_statement_em_forstat,
+    codigo_subir_forstat_statement,
+    limpar_final_statement,
+    limpar_codigo_inicial_atribstat,
+    codigo_final_statement_de_inicial
  ]
 
 Producoes = {
-"PROGRAM" : [[program_vazio, SET_STATEMENT_FOR_STAT_TO_FALSE, STATEMENT, codigo_subir_program_statement], [program_vazio, FUNCLIST, codigo_subir_program_funclist], [program_vazio, EPSILON]],
-"FUNCLIST" : [[FUNCDEF, FUNCLISTX, codigo_subir_funclist]],
-"FUNCLIST\'" : [[FUNCLIST, codigo_subir_funclistx_funclist], [EPSILON, codigo_subir_funclistx_epsilon]],
-"FUNCDEF" : [[DEF, SET_IDENT_LEXEME, IDENT, SET_TYPE_IN_LAST_TABLE, CREATE_SCOPE, OPEN_PARENTHESIS, PARAMLIST, CLOSING_PARENTHESIS, OPEN_CURLY_BRACKET, STATELIST, CLOSE_SCOPE, CLOSING_CURLY_BRACKET, RESET_IDENT_LEXEME, codigo_subir_funcdef]],
+"PROGRAM" : [[program_vazio, SET_STATEMENT_FOR_STAT_TO_FALSE, STATEMENT, codigo_subir_program_statement], [program_vazio, funclist_vazio, FUNCLIST, codigo_subir_program_funclist], [program_vazio, EPSILON]],
+"FUNCLIST" : [[FUNCDEF, codigo_subir_funclist, FUNCLISTX]],
+"FUNCLIST\'" : [[FUNCLIST], [EPSILON]],
+"FUNCDEF" : [[DEF, SET_IDENT_LEXEME, IDENT, SET_TYPE_IN_LAST_TABLE, CREATE_SCOPE, OPEN_PARENTHESIS, PARAMLIST, CLOSING_PARENTHESIS, OPEN_CURLY_BRACKET, statelist_vazio, STATELIST, CLOSE_SCOPE, CLOSING_CURLY_BRACKET, RESET_IDENT_LEXEME, codigo_subir_funcdef]],
 "PARAMLIST" : [[TYPE, SET_IDENT_LEXEME, IDENT, INSERT_VARIABLE_TYPE_INTO_TABLE_WITHOUT_INDEX, PARAMLISTX, RESET_IDENT_LEXEME], [EPSILON]],
 "PARAMLIST\'" : [[COMMA, PARAMLIST], [EPSILON]],
-"STATEMENT" : [[VARDECL, SEMICOLON, statement_vazio], [ATRIBSTAT, SEMICOLON, codigo_subir_statement_atrib], [PRINTSTAT, SEMICOLON, statement_vazio], [READSTAT, SEMICOLON, statement_vazio], [RETURNSTAT, SEMICOLON, statement_vazio], [IFSTAT, codigo_subir_statement_if], [FORSTAT, codigo_subir_statement_for], [OPEN_CURLY_BRACKET, CREATE_SCOPE, SET_FOR_OF_TS, STATELIST, CLOSE_SCOPE, CLOSING_CURLY_BRACKET, codigo_subir_statement_statelist], [BREAK, SEMICOLON, statement_vazio], [SEMICOLON, statement_vazio]],
+"STATEMENT" : [[VARDECL, SEMICOLON, codigo_final_statement_de_inicial], [codigo_inicial_atribstat_de_statement, ATRIBSTAT, SEMICOLON, codigo_subir_statement_atrib], [PRINTSTAT, SEMICOLON, codigo_final_statement_de_inicial], [READSTAT, SEMICOLON, codigo_final_statement_de_inicial], [RETURNSTAT, SEMICOLON, codigo_final_statement_de_inicial], [IFSTAT, codigo_subir_statement_if], [codigo_inicial_forstat_de_statement, FORSTAT, codigo_subir_statement_for], [OPEN_CURLY_BRACKET, CREATE_SCOPE, SET_FOR_OF_TS, codigo_inicial_statelist_de_statement, STATELIST, CLOSE_SCOPE, CLOSING_CURLY_BRACKET, codigo_subir_statement_statelist], [BREAK, SEMICOLON, codigo_final_statement_de_inicial], [SEMICOLON, codigo_final_statement_de_inicial]],
 "TYPE" : [[INT, SET_TYPE_INT], [FLOAT, SET_TYPE_FLOAT], [STRING, SET_TYPE_STRING]],
 "VARDECL" : [[SET_INDEX_INITIAL_DEPTH_UNTIL_NOW, TYPE, SET_IDENT_LEXEME, IDENT, SET_TYPE_IN_LAST_TABLE, INDEX, INSERT_VARIABLE_TYPE_INTO_TABLE_WITH_INDEX, RESET_IDENT_LEXEME]],
 "INDEX" : [[OPEN_SQUARE_BRACKET, INT_CONSTANT, CLOSING_SQUARE_BRACKET, SET_INDEX_DEPTH_UNTIL_NOW_PLUS_ONE, INDEX, SET_INDEX_DEPTH], [EPSILON, SET_INDEX_DEPTH_BASED_ON_UNTIL_NOW]],
-"ATRIBSTAT" : [[LVALUE, SET_ATRIBSTAT_FIRST_TYPE, EQUALS, RESULT, GCI_MATH_result, SET_ATRIBSTAT_TYPE_BASED_ON_FIRST_TYPE_OR_THROW_ERROR, GCI_atribstat]],
-"RESULT" : [[SIGN, FACTOR, CREATE_EXPR_FACTOR_NODE, EXPR, SET_RESULT_NODE, SET_RESULT_TYPE_BASED_ON_FACTOR_OR_THROW_ERROR], [FACTORX, CREATE_EXPR_FACTORX_NODE, EXPR, SET_RESULT_NODE, SET_RESULT_TYPE_BASED_ON_FACTORX_OR_THROW_ERROR], [SET_RESULT_LEXEME, IDENT, CREATE_RESULTX_IDENT_NODE, RESULTX, SET_RESULT_FIRST_TYPE, SET_RESULT_FROM_RESULTX_FINAL_NODE, SET_RESULT_TYPE_OR_THROW_ERROR, RESET_RESULT_LEXEME], [ALLOCEXPRESSION]],
+"ATRIBSTAT" : [[LVALUE, SET_ATRIBSTAT_FIRST_TYPE, EQUALS, RESULT, GCI_MATH_result, SET_ATRIBSTAT_TYPE_BASED_ON_FIRST_TYPE_OR_THROW_ERROR, GCI_ATRIBSTAT]],
+"RESULT" : [[SIGN, FACTOR, CREATE_EXPR_FACTOR_NODE, EXPR, SET_RESULT_NODE, SET_RESULT_TYPE_BASED_ON_FACTOR_OR_THROW_ERROR], [FACTORX, CREATE_EXPR_FACTORX_NODE, EXPR, SET_RESULT_NODE, SET_RESULT_TYPE_BASED_ON_FACTORX_OR_THROW_ERROR], [SET_RESULT_LEXEME, IDENT, CREATE_RESULTX_RESULT_NODE, RESULTX, SET_RESULT_FIRST_TYPE, SET_RESULT_FROM_RESULTX_FINAL_NODE, SET_RESULT_TYPE_OR_THROW_ERROR, RESET_RESULT_LEXEME], [ALLOCEXPRESSION]],
 "RESULT\'" : [[SET_APPNUM_DEPTH_ZERO, APPNUM, SET_RESULTX_APPNUM_DEPTH, CREATE_EXPR_RESULTX_NODE, EXPR, SET_RESULTX_FINAL_NODE, SET_RESULTX_EXPR_TYPE], [OPEN_PARENTHESIS, PARAMLISTCALL, CLOSING_PARENTHESIS, SET_RESULTX_ZERO_DEPTH, SET_RESULTX_EMPTY_TYPE]],
 "EXPR" : [[SET_ADDUNARY_FIRST_NODE_BASED_ON_EXPR, ADDUNARY, SET_ADDTERM_FIRST_NODE_BASED_ON_ADDUNARY, ADDTERM, SET_MORENUMEXP_FIRST_NODE_BASED_ON_ADDTERM, MORENUMEXP, SET_EXPR_FINAL_NODE, SET_EXPR_TYPE_OR_THROW_ERROR]],
 "FUNCCALL" : [[IDENT, OPEN_PARENTHESIS, PARAMLISTCALL, CLOSING_PARENTHESIS]],
@@ -282,9 +307,9 @@ Producoes = {
 "RETURNSTAT" : [[RETURN, IDENT]],
 "IFSTAT" : [[IF, OPEN_PARENTHESIS, EXPRESSION, CLOSING_PARENTHESIS, SET_STATEMENT_FOR_STAT_TO_FALSE, STATEMENT, MORESTAT, ENDIF, GCI_IF]],
 "MORESTAT" : [[ELSE, SET_STATEMENT_FOR_STAT_TO_FALSE, STATEMENT, codigo_subir_morestat_statement], [EPSILON, codigo_subir_morestat_epsilon]],
-"FORSTAT" : [[FOR, OPEN_PARENTHESIS, ATRIBSTAT, SEMICOLON, EXPRESSION, SEMICOLON, ATRIBSTAT, CLOSING_PARENTHESIS, SET_STATEMENT_FOR_STAT_TO_TRUE, STATEMENT, GCI_FOR]],
-"STATELIST" : [[SET_STATEMENT_FOR_STAT_TO_FALSE, STATEMENT, MORESTATELIST, codigo_subir_statelist]],
-"MORESTATELIST" : [[STATELIST, codigo_subir_morestatlist_state], [EPSILON, codigo_subir_morestatlist_epsilon]],
+"FORSTAT" : [[FOR, OPEN_PARENTHESIS, codigo_inicial_atribstat_de_forstat, ATRIBSTAT, SEMICOLON, EXPRESSION, SEMICOLON, codigo_inicial_statement_em_forstat, limpar_codigo_inicial_atribstat, ATRIBSTAT, codigo_final_statement_em_forstat, CLOSING_PARENTHESIS, SET_STATEMENT_FOR_STAT_TO_TRUE, STATEMENT, limpar_final_statement, codigo_subir_forstat_statement]],
+"STATELIST" : [[SET_STATEMENT_FOR_STAT_TO_FALSE, codigo_inicial_statement_de_statelist, STATEMENT, codigo_inicial_morestatelist_de_statement, MORESTATELIST, codigo_subir_statelist]],
+"MORESTATELIST" : [[codigo_inicial_statelist_de_morestatelist, STATELIST, codigo_subir_morestatlist_state], [EPSILON, codigo_subir_morestatlist_epsilon]],
 "ALLOCEXPRESSION" : [[NEW, TYPE, NUMEXPRESSIONS]],
 "NUMEXPRESSIONS" : [[OPEN_SQUARE_BRACKET, NUMEXPRESSION, CLOSING_SQUARE_BRACKET, NUMEXPRESSIONSX, SET_NUMEXPRESSIONS_PLUS_ONE]],
 "NUMEXPRESSIONS\'" : [[NUMEXPRESSIONS], [EPSILON]],
@@ -301,7 +326,7 @@ Producoes = {
 "MOREFACTOR": [[SIGN, SET_MOREFACTOR_SIGN_FROM_SIGN], [EPSILON, SET_NO_MOREFACTOR_SIGN]],
 "FACTOR" : [[FACTORX, SET_FACTOR_FROM_FACTORX_NODE, SET_FACTOR_TYPE_BASED_ON_FACTORX_TYPE], [LVALUE, SET_FACTOR_FROM_LVALUE_NODE, SET_FACTOR_TYPE_BASED_ON_LVALUE_TYPE]],
 "FACTOR\'" : [[SET_FACTORX_LEXEME, INT_CONSTANT, CREATE_FACTORX_NODE, SET_FACTORX_INT_TYPE], [SET_FACTORX_LEXEME, FLOAT_CONSTANT, CREATE_FACTORX_NODE, SET_FACTORX_FLOAT_TYPE], [SET_FACTORX_LEXEME, STRING_CONSTANT, CREATE_FACTORX_NODE, SET_FACTORX_STRING_TYPE], [NULL, CREATE_NULL_NODE, SET_FACTORX_NULL_TYPE], [OPEN_PARENTHESIS, EXPRESSION, CLOSING_PARENTHESIS, SET_FACTORX_FROM_EXPRESSION_NODE, SET_FACTORX_EXPRESSION_TYPE]],
-"LVALUE" : [[SET_IDENT_LEXEME, IDENT, subir_lvalue_lexeme_IDENT, SET_APPNUM_DEPTH_ZERO, APPNUM, CREATE_LVALUE_IDENT_NODE, SET_LVALUE_TYPE, RESET_IDENT_LEXEME]],
+"LVALUE" : [[SET_IDENT_LEXEME, IDENT, subir_lvalue_lexeme_IDENT, SET_APPNUM_DEPTH_ZERO, APPNUM, CREATE_LVALUE_LVALUE_NODE, SET_LVALUE_TYPE, RESET_IDENT_LEXEME]],
 "APPNUM": [[SET_NUMEXPRESSIONS_ZERO, NUMEXPRESSIONS, SET_APPNUM_DEPTH], [EPSILON]],
 }
 
@@ -309,26 +334,26 @@ NTs = [ PROGRAM, FUNCLIST, FUNCLISTX, FUNCDEF, PARAMLIST, PARAMLISTX, STATEMENT,
 Terminais = [EPSILON, DEF, IDENT, OPEN_PARENTHESIS, CLOSING_PARENTHESIS, OPEN_CURLY_BRACKET, CLOSING_CURLY_BRACKET, OPEN_SQUARE_BRACKET, CLOSING_SQUARE_BRACKET, COMMA, SEMICOLON, BREAK, INT, FLOAT, STRING, INT_CONSTANT, EQUALS, PRINT, READ, RETURN, ELSE, FOR, NEW, GREATER, LESS, LESS_EQUAL, GREATER_EQUAL, EQUAL, DIFFERENT, PLUS, MINUS, MULTIPLICATION, DIVISION, MODULUS, INT_CONSTANT, FLOAT_CONSTANT, STRING_CONSTANT, NULL]
 LL1Action = [
     [program_vazio, SET_STATEMENT_FOR_STAT_TO_FALSE, STATEMENT, codigo_subir_program_statement],
-    [program_vazio, FUNCLIST, codigo_subir_program_funclist],
+    [program_vazio, funclist_vazio, FUNCLIST, codigo_subir_program_funclist],
     [program_vazio, EPSILON],
-    [FUNCDEF, FUNCLISTX, codigo_subir_funclist],
-    [FUNCLIST, codigo_subir_funclistx_funclist],
-    [EPSILON, codigo_subir_funclistx_epsilon],
-    [DEF, SET_IDENT_LEXEME, IDENT, SET_TYPE_IN_LAST_TABLE, CREATE_SCOPE, OPEN_PARENTHESIS, PARAMLIST, CLOSING_PARENTHESIS, OPEN_CURLY_BRACKET, STATELIST, CLOSE_SCOPE, CLOSING_CURLY_BRACKET, RESET_IDENT_LEXEME, codigo_subir_funcdef],
+    [FUNCDEF, codigo_subir_funclist, FUNCLISTX],
+    [FUNCLIST],
+    [EPSILON],
+    [DEF, SET_IDENT_LEXEME, IDENT, SET_TYPE_IN_LAST_TABLE, CREATE_SCOPE, OPEN_PARENTHESIS, PARAMLIST, CLOSING_PARENTHESIS, OPEN_CURLY_BRACKET, statelist_vazio, STATELIST, CLOSE_SCOPE, CLOSING_CURLY_BRACKET, RESET_IDENT_LEXEME, codigo_subir_funcdef],
     [TYPE, SET_IDENT_LEXEME, IDENT, SET_TYPE_IN_LAST_TABLE, INSERT_VARIABLE_TYPE_INTO_TABLE_WITHOUT_INDEX, PARAMLISTX, RESET_IDENT_LEXEME],
     [EPSILON],
     [COMMA, PARAMLIST],
     [EPSILON],
-    [VARDECL, SEMICOLON, statement_vazio],
-    [ATRIBSTAT, SEMICOLON, codigo_subir_statement_atrib],
-    [PRINTSTAT, SEMICOLON, statement_vazio],
-    [READSTAT, SEMICOLON, statement_vazio],
-    [RETURNSTAT, SEMICOLON, statement_vazio],
+    [VARDECL, SEMICOLON, codigo_final_statement_de_inicial],
+    [codigo_inicial_atribstat_de_statement, ATRIBSTAT, SEMICOLON, codigo_subir_statement_atrib],
+    [PRINTSTAT, SEMICOLON, codigo_final_statement_de_inicial],
+    [READSTAT, SEMICOLON, codigo_final_statement_de_inicial],
+    [RETURNSTAT, SEMICOLON, codigo_final_statement_de_inicial],
     [IFSTAT, codigo_subir_statement_if],
-    [FORSTAT, codigo_subir_statement_for],
-    [OPEN_CURLY_BRACKET, CREATE_SCOPE, SET_FOR_OF_TS, STATELIST, CLOSE_SCOPE, CLOSING_CURLY_BRACKET, codigo_subir_statement_statelist],
-    [BREAK, VERIFY_BREAK_INSIDE_FOR, SEMICOLON, statement_vazio],
-    [SEMICOLON, statement_vazio],
+    [codigo_inicial_forstat_de_statement, FORSTAT, codigo_subir_statement_for],
+    [OPEN_CURLY_BRACKET, CREATE_SCOPE, SET_FOR_OF_TS, codigo_inicial_statelist_de_statement, STATELIST, CLOSE_SCOPE, CLOSING_CURLY_BRACKET, codigo_subir_statement_statelist],
+    [BREAK, VERIFY_BREAK_INSIDE_FOR, SEMICOLON, codigo_final_statement_de_inicial],
+    [SEMICOLON],
     [INT, SET_TYPE_INT],
     [FLOAT, SET_TYPE_FLOAT],
     [STRING, SET_TYPE_STRING],
@@ -338,7 +363,7 @@ LL1Action = [
     [LVALUE, SET_ATRIBSTAT_FIRST_TYPE, EQUALS, RESULT, GCI_MATH_result, SET_ATRIBSTAT_TYPE_BASED_ON_FIRST_TYPE_OR_THROW_ERROR, GCI_ATRIBSTAT],
     [SIGN, FACTOR, CREATE_EXPR_FACTOR_NODE, EXPR, SET_RESULT_NODE, SET_RESULT_TYPE_BASED_ON_FACTOR_OR_THROW_ERROR],
     [FACTORX, CREATE_EXPR_FACTORX_NODE, EXPR, SET_RESULT_NODE, SET_RESULT_TYPE_BASED_ON_FACTORX_OR_THROW_ERROR],
-    [SET_RESULT_LEXEME, IDENT, CREATE_RESULTX_IDENT_NODE, RESULTX, SET_RESULT_FROM_RESULTX_FINAL_NODE, SET_RESULT_FIRST_TYPE, SET_RESULT_TYPE_OR_THROW_ERROR, RESET_RESULT_LEXEME],
+    [SET_RESULT_LEXEME, IDENT, CREATE_RESULTX_RESULT_NODE, RESULTX, SET_RESULT_FROM_RESULTX_FINAL_NODE, SET_RESULT_FIRST_TYPE, SET_RESULT_TYPE_OR_THROW_ERROR, RESET_RESULT_LEXEME],
     [ALLOCEXPRESSION],
     [SET_APPNUM_DEPTH_ZERO, APPNUM, SET_RESULTX_APPNUM_DEPTH, CREATE_EXPR_RESULTX_NODE, EXPR, SET_RESULTX_FINAL_NODE, SET_RESULTX_EXPR_TYPE],
     [OPEN_PARENTHESIS, PARAMLISTCALL, CLOSING_PARENTHESIS, SET_RESULTX_ZERO_DEPTH, SET_RESULTX_EMPTY_TYPE],
@@ -354,9 +379,9 @@ LL1Action = [
     [IF, OPEN_PARENTHESIS, EXPRESSION, CLOSING_PARENTHESIS, SET_STATEMENT_FOR_STAT_TO_FALSE, STATEMENT, MORESTAT, ENDIF, GCI_IF],
     [ELSE, SET_STATEMENT_FOR_STAT_TO_FALSE, STATEMENT, codigo_subir_morestat_statement],
     [EPSILON, codigo_subir_morestat_epsilon],
-    [FOR, OPEN_PARENTHESIS, ATRIBSTAT, SEMICOLON, EXPRESSION, SEMICOLON, ATRIBSTAT, CLOSING_PARENTHESIS, SET_STATEMENT_FOR_STAT_TO_TRUE, STATEMENT, GCI_FOR],
-    [SET_STATEMENT_FOR_STAT_TO_FALSE, STATEMENT, MORESTATELIST, codigo_subir_statelist],
-    [STATELIST, codigo_subir_morestatlist_state],
+    [FOR, OPEN_PARENTHESIS, codigo_inicial_atribstat_de_forstat, ATRIBSTAT, SEMICOLON, EXPRESSION, SEMICOLON, codigo_inicial_statement_em_forstat, limpar_codigo_inicial_atribstat,ATRIBSTAT, codigo_final_statement_em_forstat, CLOSING_PARENTHESIS, SET_STATEMENT_FOR_STAT_TO_TRUE, STATEMENT, limpar_final_statement, codigo_subir_forstat_statement],
+    [SET_STATEMENT_FOR_STAT_TO_FALSE, codigo_inicial_statement_de_statelist, STATEMENT, codigo_inicial_morestatelist_de_statement, MORESTATELIST, codigo_subir_statelist],
+    [codigo_inicial_statelist_de_morestatelist, STATELIST, codigo_subir_morestatlist_state],
     [EPSILON, codigo_subir_morestatlist_epsilon],
     [NEW, TYPE, NUMEXPRESSIONS],
     [OPEN_SQUARE_BRACKET, NUMEXPRESSION, CLOSING_SQUARE_BRACKET, NUMEXPRESSIONSX, SET_NUMEXPRESSIONS_PLUS_ONE],
@@ -392,7 +417,7 @@ LL1Action = [
     [SET_FACTORX_LEXEME, STRING_CONSTANT, CREATE_FACTORX_NODE, SET_FACTORX_STRING_TYPE],
     [NULL, CREATE_NULL_NODE, SET_FACTORX_NULL_TYPE],
     [OPEN_PARENTHESIS, EXPRESSION, CLOSING_PARENTHESIS, SET_FACTORX_FROM_EXPRESSION_NODE, SET_FACTORX_EXPRESSION_TYPE],
-    [SET_IDENT_LEXEME, IDENT, subir_lvalue_lexeme_IDENT, SET_APPNUM_DEPTH_ZERO, APPNUM, CREATE_LVALUE_IDENT_NODE, SET_LVALUE_TYPE, RESET_IDENT_LEXEME],
+    [SET_IDENT_LEXEME, IDENT, subir_lvalue_lexeme_IDENT, SET_APPNUM_DEPTH_ZERO, APPNUM, CREATE_LVALUE_LVALUE_NODE, SET_LVALUE_TYPE, RESET_IDENT_LEXEME],
     [SET_NUMEXPRESSIONS_ZERO, NUMEXPRESSIONS, SET_APPNUM_DEPTH],
     [EPSILON]
 ]

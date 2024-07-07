@@ -1,4 +1,12 @@
 def main() {
     int x;
-    x = 5;
+    int y;
+    x = 5 * 20 - 30 + 12;
+    y = 10;
+    int i;
+    for (i = 0; i < 10; i = i + 1) {
+        int j;
+        j = 10 + 20;
+    }
+    return y;
 }
